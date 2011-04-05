@@ -67,8 +67,9 @@
 		 * @api public
 		 */
 		proxy: {
-			// validation
+			// validation and registration
 			'check:nickname':	 	'check:nickname',
+			'account:created':	'account:created',
 			
 			// messages
 			'notice':				'notice',
@@ -150,6 +151,21 @@
 		 */
 		check: function(field,value){
 			this.io.send({type:"validate:check", field:field, value:value})
+		},
+		
+		/**
+		 * Create a new account the server
+		 *
+		 * @param {String} nickname The nickname for the chat
+		 * @param {String} email The email address
+		 *
+		 * @api public
+		 */
+		createAccount: function(nickname, email){
+			nickname = '' + nickname;
+			email = '' + email;
+			
+			this.io.send({type: "account:create", nickname: nickname, email:email });
 		}
 	};
 	_.extend(EventedParser, Backbone.Events);
@@ -187,22 +203,25 @@
 			// Add a form handler for the .auth panel because this can be accesed using 2 different urls
 			var self = this
 				, form = $(".auth form").live("submit", function(e){
-					e && e.preventDefault();
-					
-					var tmp;
-					if (self.state === 'auth'){
-						tmp = form.find('input[name="nickname"]');
-						if (tmp.val() === '') return alert('Nickname is required, ZING!');
+						e && e.preventDefault();
 						
-						EventedParser.once("check:nickname", function(data){
-							if( data && data.validates ){
-								$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
-							} else {
-								alert(data ? data.message : "Unable to validate the nickname")
-							}
-						});
-						
-						EventedParser.check("nickname", tmp.val() );
+						var nickname, email;
+						if (self.state === 'auth'){
+							nickname = form.find('input[name="nickname"]').val();
+							email = form.find('input[name="email"]').val();
+							
+							if (nickname === '') return alert('Nickname is required');
+							if (email === '') return alert('Your e-mail address is required');
+							
+							EventedParser.once("account:created", function(data){
+								if( data && data.validates ){
+									$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
+								} else {
+									alert(data ? data.message : "Unable to validate the nickname")
+								}
+							});
+							
+							EventedParser.createAccount(nickname, email);
 					}
 			});
 			

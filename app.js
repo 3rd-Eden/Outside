@@ -122,14 +122,17 @@ io.on('connection', function( client ){
 	client.on( 'account:create', function( data ){
 		if (client.nickname) return false;
 		
+		if (!data.nickname || !data.email || typeof data.nickname !== 'string' || typeof data.email !== 'string')
+			return client.filter({ type:'account:created', validates:false, message:'Unable to create a account, make sure you filled in all details' });
+		
 		// the account details are validating, so setup the actual account
 		client.nickname = data.nickname;
-		client.avatar = data.avatar;
+		client.avatar = gravatar.url(data.email, {s:48, r:'pg', d: '404'});
 		client.details.connected = new Date();
 		
 		// subscribe to a channel and notify the user
 		channel.subscribe(client);
-		channel.update(client);
+		client.filter({ type:'account:created', users: channel.roommates(client), validates: true, avatar: client.avatar });
 		
 		// announce that a new user has joined
 		io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details }, client));
