@@ -1,0 +1,20 @@
+/*
+#masthead { opacity: 0.1; -webkit-transition: all 0.05s ease-out; }
+#masthead:hover { opacity: 1; -webkit-transition: all 0.05s ease-in; }
+*/
+
+
+.table { /* background-color: lime; */ }
+
+
+div.boxed { overflow: hidden; max-width: 100%; }
+
+
+	.users .user { /* padding: 0; */ }
+	
+
+div.boxed, .users-active { height: 100%; padding-top: 60px; }
+
+
+.box form .msg-send { text-align: center; }
+.box form .msg-send button { width: 80px; height: 24px; }

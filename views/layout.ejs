@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Le pew pew</title>
+	<link href="/master.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="/zing.css" media="screen" rel="stylesheet" type="text/css" />
+	<link href="/debug.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<header id="masthead">
+  <h1><a href="#">Outside</a></h1>
+  <nav>
+   <ul class="inline">
+     <li class="salut">Hello <a href="#">Arnout Kazemier</a>
+     <li><a class="btn btnL"href="#">settings</a></li>
+     <li><a class="btn btnC"href="#">share</a></li>
+     <li><a class="btn btnR"href="#">logout</a></li>
+   </ul>
+  </nav>
+</header>
+<%- partial('inc/auth.ejs') %>
+<!-- the app -->
+<div class="app hidden">
+  <section class="box">
+<%- partial('inc/messageBox.ejs') %>
+  </section>
+<%- partial('inc/usersList.ejs') %>
+<%- partial('inc/userDetails.ejs') %>
+</div>
+<!-- / -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/underscore.1.1.5.js"></script>
+<script src="/js/backbone.0.3.js"></script>
+<script src="/js/boot.js"></script>
+</body>
+</html>

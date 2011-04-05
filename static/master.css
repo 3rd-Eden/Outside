@@ -1,0 +1,196 @@
+/* reset */
+html, body, .app, aside.details, .users, .box { height: 100%; }
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var,optgroup{font-style:inherit;font-weight:inherit;}del,ins{text-decoration:none;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:baseline;}sub{vertical-align:baseline;}legend{color:#000;}input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}input,button,textarea,select{*font-size:100%;}
+:focus { outline: none; }
+
+/* styles */
+body { font-family: Helvetica; color: #656565; font-size: 12px; }
+html.loggedin { background-image: url(/i/background.png); }
+
+ul.inline li { float: left; display: inline-block; list-style: none inside; }
+.none, .hidden { display: none; }
+.table { display: table; width: 100%; }
+.tr { display: table-row; }
+.td { display: table-cell; }
+.t-cap { display: table-caption; }
+.t-foot { display: table-footer-group; }
+.t-foot .td { height: 100px; }
+/**/
+.btn, .btnL, .btnC, .btnR {
+	background-color: #60ac40;
+	background:  linear-gradient(top, #60ac40, #509535);
+		background:  -moz-linear-gradient(top, #60ac40, #509535);
+		background:  -webkit-linear-gradient(top, #60ac40, #509535);
+	text-shadow: 0px 1px 0px #4f8f34;
+	border-radius: 3px 3px 3px 3px;	-webkit-border-radius: 3px 3px 3px 3px;	-moz-border-radius: 3px 3px 3px 3px;
+	border: 1px solid #488a2e;
+	box-shadow: 0px 1px 1px rgba(0,0,0,0.1), inset -1px 1px 0px #79c452;
+		-moz-box-shadow: 0px 1px 1px rgba(0,0,0,0.1), inset -1px 1px 0px #79c452;
+		-webkit-box-shadow: 0px 1px 1px rgba(0,0,0,0.1), inset -1px 1px 0px #79c452;
+	color: #FFF; padding: 7px 14px;
+	}
+.btnL { border-right: 0; border-radius: 3px 0 0 3px; -webkit-border-radius: 3px 0 0 3px; -moz-border-radius: 3px 0 0 3px; }
+.btnC { border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.btnR { border-left: 0; border-radius: 0 3px 3px 0; -webkit-border-radius: 0 3px 3px 0; -moz-border-radius: 0 3px 3px 0; box-shadow: 0px 1px 1px rgba(0,0,0,0.1), inset 0px 1px 0px #79c452;  }
+.btn:active {
+box-shadow: inset 0 -1px 0px #79c452, inset 0 1px 6px rgba(0,0,0,0.24); -moz-box-shadow: inset 0 -1px 0px #79c452, inset 0 1px 6px rgba(0,0,0,0.24); -webkit-box-shadow: inset 0 -1px 0px #79c452, inset 0 1px 6px rgba(0,0,0,0.24);
+	background: linear-gradient(bottom, #60ac40, #509535);
+		background: -moz-linear-gradient(bottom, #60ac40, #509535);
+		background: -webkit-linear-gradient(bottom, #60ac40, #509535);
+text-shadow: 0px -1px 0px #4f8f34; color: #FFF;
+-webkit-transition: all 0.05s ease-in-out;
+}
+/**/
+.input { background:#edf2f3; display:inline-block; padding:4px; border-radius:5px; display: table; }
+	.input input { padding:5px; width:300px; border:1px solid #9fa5af; height:20px; box-shadow: inset 0 1px 6px rgba(0,0,0,0.1); border-radius:3px; display: table-cell; }
+
+/* app layout */
+#masthead { background: url(i/top_bar.png) repeat-x 0 0; display: table; position: absolute; top: 0; width: 100%; min-width: 640px; color: #FFF; text-shadow: 0px 1px 0px #4f8f34;  height: 60px; }
+#masthead h1, #masthead nav { display: table-cell; vertical-align: middle; padding: 0 22px;  }
+#masthead a { font-weight: bold; color: #FFF; text-decoration: none; }
+	#masthead nav ul { float: right; }
+	#masthead .salut { color: #dff3c0; padding-right: 24px; }
+		#masthead .salut a { margin-left: 0.5em; }
+
+.loggedin div.app { overflow: hidden; width: 100%; display: table }
+	.box, .users, aside.details { display: table-cell; }
+
+.box { min-width: 400px; position:relative }
+
+
+/**
+ * Styling for the Authentication and login view
+ *
+ * @view Default
+ * @section Small status sidebar
+ * @section Sign-in using a service
+ * @section Sign-in anonymous
+ *
+ * @availablity Default
+ */
+
+ /* defaults */
+ .auth { position:fixed; top:50%; left:50%; width:700px; height:280px; margin-top:-140px; margin-left:-350px; background:#fff }
+ 	.auth form { width:350px; height:280px; float:left; color:#a2aeb1; border-right:1px solid #c3c7ce }
+		.auth label { display:block; margin:25px 0 10px }
+
+	/* left sections */
+	.auth .regular, .auth .services { border-right:2px solid #edf2f3; height:280px; overflow:hidden }
+		.auth .regular a,
+		.auth .services a { float:left; text-decoration:none; color:#a2aeb1; border-bottom:1px dotted #a2aeb1; margin-top:35px }
+		.auth .regular button { float:right; height:35px; width:120px; margin: 25px 30px 0 0 }
+		.auth .services h3 { font-size:18px; font-weight:600; margin: 70px 0 35px }
+			.auth .services .brand { color:#5ca63d }
+		.auth .services em { margin: 0 25px; line-height:35px}
+		.auth .services button { height:35px; width:120px }
+			.auth button.twitter span { background:url(/i/sprite.png) no-repeat scroll 0 -21px; padding:8px; margin-right:10px }
+			.auth button.facebook span { background:url(/i/sprite.png) no-repeat scroll 0 -57px; padding:8px; margin-right:10px }
+		.auth .services .anonymous { color:#5ca63d; padding: 10px 0 0 30px; background:url(/i/sprite.png) no-repeat scroll 10px 7px }
+	.auth .services { display:none }
+
+	/* right section */
+	.auth aside { float:left; background:#FFF; border-left:3px solid #edf2f3; padding-left:25px; height:280px }
+		.auth dl { margin:25px 0 70px 75px;  height:65px }
+			.auth .nickname { font-size:18px; color:#5ca63d; font-weight:600; margin-top:5px }
+			.auth .gravatar img { background:#fff; padding:2px; border:1px solid #d0d0d0; position:absolute; margin: -45px 0 0 -75px }
+		.auth .status { background:#fff; border:1px solid #e5e5e5; border-radius:4px; width:240px; overflow:hidden; padding:8px }
+			.auth .status li { float:left; text-align:center; border-right:1px dotted #edf2f3; width:79px; line-height:2em }
+				.auth .status li.last { border:0 }
+				.auth .status strong { display:block; color:#5ca63d; font-weight:600; font-size:18px }
+		.auth h2 { font-size:18px; margin-bottom:10px; font-weight:bold }
+
+/**
+ * Details view
+ */
+aside.details { background: #fff; width:285px; min-width:285px; border-left:3px solid #edf2f3; padding:20px 0 20px 20px }
+	aside.details dl { margin:25px 0 20px 75px;  height:65px }
+		aside.details .nickname { font-size:18px; color:#5ca63d; font-weight:600; margin-bottom:5px }
+		aside.details .gravatar img { background:#fff; padding:2px; border:1px solid #d0d0d0; position:absolute; margin: -45px 0 0 -75px }
+
+	aside.details .status { background:#fff; border:1px solid #e5e5e5; border-radius:4px; width:240px; overflow:hidden; padding:8px; margin-bottom:45px }
+		aside.details .status li { float:left; text-align:center; border-right:1px dotted #edf2f3; width:79px; line-height:2em }
+			aside.details .status li.last { border:0 }
+			aside.details .status strong { display:block; color:#5ca63d; font-weight:600; font-size:18px }
+
+	aside.details a.btn { height:21px; width:92px; display:block; line-height:21px; float:left; text-align:center; font-weight:600; width:100px }
+		aside.details .block { margin-left:15px }
+		aside.details a.block {
+			border-color:#c3c7ce; background: #F7FAFC; background: -moz-linear-gradient(top, #F7FAFC 0%, #EFF3F7 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7FAFC), color-stop(100%,#EFF3F7)); color:#656565; text-shadow: 0px 1px 0px #fff;
+			box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), inset -1px 1px 0px #fff; -moz-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), inset -1px 1px 0px #fff;-webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), inset -1px 1px 0px #fff;
+		}
+			aside.details a.block:active { box-shadow: inset 0 -1px 0px #fff, inset 0 1px 6px rgba(0,0,0,0.24); -moz-box-shadow: inset 0 -1px 0px #fff, inset 0 1px 6px rgba(0,0,0,0.24); -webkit-box-shadow: inset 0 -1px 0px #fff, inset 0 1px 6px rgba(0,0,0,0.24) }
+
+	aside.details h4 { clear:both; font-size:18px; font-weight:600; padding-top:50px; width:256px; overflow:hidden }
+		aside.details h4 .realtime { padding:10px 7px; background:url(/i/sprite.png) no-repeat scroll -21px -104px; float:right }
+		aside.details h4 .realtime-enabled { padding:10px 7px; background:url(/i/sprite.png) no-repeat scroll 0 -104px; float:right }
+
+	aside.details hr { display:block; background: url(i/hr.png) repeat-x; border:0; height:8px; margin-bottom:0px; position:relative; width:100%; margin-left:-20px; z-index:1; padding:0 20px }
+	aside.details ol {  background: url(/i/background.png); height:100%; margin-top:-8px; padding:20px; overflow:auto; width:100%; position:relative; margin-left:-20px }
+		aside.details ol li { color:#919191; overflow:hidden; padding-top:10px }
+			aside.details ol time { float:right; color:#656565; padding-bottom:10px; margin-top:15px; font-size:11px; margin-right: 20px }
+
+/**
+ * Users list, this is the middle sidebar which contains buttons or lists
+ * with the current active users in your selected chatbox, but also a list
+ * with active private messages.
+ *
+ * @view Chat
+ * @section Users
+ * @section PM
+ *
+ * @availablity Defer
+ */
+.users { background: #FAFAFA; width: 240px; min-width: 240px; border: 1px solid #c3c7ce; border-width: 0 1px; overflow:hidden; }
+	.users .joined, .users footer { border:3px solid #edf2f3; border-width: 0 2px 0 3px; width:235px }
+
+	/* default button styling */
+	.users .user {
+		background: #F7FAFC; border-top:1px solid #fff; border-bottom:1px solid #c3c7ce; padding:7px 15px; overflow:hidden; line-height: 28px;
+		background: -moz-linear-gradient(top, #F7FAFC 0%, #EFF3F7 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7FAFC), color-stop(100%,#EFF3F7))
+	}
+		.users .user img { width:24px; height:24px; padding:1px; border:1px solid #dadee1; float:left }
+		.users .user a.message { font-size:14px; color:#656565; text-decoration:none; font-weight:600; margin-left:15px; text-shadow: 0px 1px 0px #fff }
+		.users .user span { float:right; font-size:14px; font-weight:600; }
+
+	/* personal message */
+	.pm .user {
+		background: #A0CC56; border-top:1px solid #b6d869; border-bottom:1px solid #74ae2e; color:#fff;
+		background: -moz-linear-gradient(top, #A0CC56 0%, #8FC44E 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#A0CC56), color-stop(100%,#8FC44E));
+	}
+		.pm .user a.message { color:#fff; text-shadow: 0px 1px 0px #88b54a; }
+		.pm .user img { border-color:#81bb3b; border-color:rgba(61,151,0,.3); background:#b4d684 }
+		.pm .user span {
+			border:1px solid #88c047; border-top:1px solid #80b543; border-bottom:1px solid #b6d869; border-radius: 15px; background:rgba(128,181,67,0.6); color:#fff; text-shadow: 0px 1px 0px #88b54a;
+			padding: 0px 8px; height: 23px; line-height: 23px; margin-top: 3px
+		}
+
+	/* details, the button that trigged the defaults panel */
+	.users .details {
+		background: #60AC40; border-top:1px solid #79c352; border-bottom:1px solid #488a2e; color:#fff;
+		background: -moz-linear-gradient(top, #60AC40 0%, #519635 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#60AC40), color-stop(100%,#519635));
+	}
+		.users .details img { border-color:#3d8128; border-color:rgba(0,81,0,.3); background:#86ba73 }
+		.users .details a.message { color:#fff; text-shadow:0px 1px 0px #4f9034 }
+		.users .details span {
+			border:1px solid #60a93f; border-top:1px solid #519836; border-bottom:1px solid #72be4b; border-radius: 15px; background:rgba(81,152,54,0.6); color:#fff; text-shadow: 0px 1px 0px #4f9034;
+			padding: 0px 8px; height: 23px; line-height: 23px; margin-top: 3px
+		}
+
+/**
+ * Chatbox
+	.box form { position:absolute; bottom:0px; width:100%; background:#fff; padding:15px 0 }
+	.box form .input { margin-left:15px; }
+		.box form input { min-width:500px; font-size:14px; font-weight:600; color:#656565 }
+ */
+
+	.box form { display: block; width: 100%; }
+		.box form input { width: 100%; font-size:14px; font-weight:600; color:#656565; -webkit-box-shadow: 0 0 0 5px #edf2f3, inset 0 1px 6px rgba(0,0,0,0.1); padding:5px 0; text-indent: 5px; border:1px solid #9fa5af; height:20px; border-radius:3px; }
+		
+		.box form .msg-input { padding: 12px; }
+		.box form .msg-send { width: 100px; display: table-cell; overflow: hidden; }
+
+/**
+ * messages
+ */
+
+.messages .me { background:#fff; border:3px solid #edf2f3; padding:10px 35px 10px 10px }
