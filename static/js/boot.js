@@ -6,7 +6,7 @@
  */
 (function(development){
 	/**
-	 * Add Node.js Event Emitter API compatiblity
+	 * Add Node.js Event Emitter API compatiblity, just because we are cool like that
 	 */
 	Backbone.Events.emit = Backbone.Events.trigger;
 	Backbone.Events.on = Backbone.Events.bind;
@@ -24,6 +24,24 @@
 			
 		this.on(event, removeable);
 	};
+	
+	/**
+	 * A small user collection 
+	 */
+	var Users = Backbone.Collection.extend({
+			model: Backbone.Model.extend({
+					/**
+					 * @param {Object} details The default properties of a user
+					 * @param {String} details.nickname The nickname of the user
+					 * @param {String} details.avatar URL to the avatar
+					 */
+					initialize: function( details ){
+						if (!details || !details.nickname || !details.avatar ){
+							throw "Invalid details";
+						}
+					}
+			})
+	});
 	
 	/**
 	 * Evented Socket.IO stream parser
@@ -267,6 +285,7 @@
 	 * Initiate `Outside` application
 	 */
 	var Application = new Outside();
+		
 	Backbone.history.start();
 	
 	// if the hash `#/` isn't set, we are going to load it, so our "loaded" method
