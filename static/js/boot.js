@@ -26,21 +26,27 @@
 	};
 	
 	/**
+	 * Disable the Sync because we are using the socket.io connection for
+	 * that. In the future it might be nice to use Socket.IO as Backbone.sync
+	 * but for now, to much hassle. Sync is used by collections.. 
+	 * 
+	 * @type {Function}
+	 */
+	 Backbone.sync = function(){};
+	
+	/**
 	 * A small user collection 
 	 */
-	var Users = Backbone.Collection.extend({
+	var PotentialFriends = Backbone.Collection.extend({
 			model: Backbone.Model.extend({
-					/**
-					 * @param {Object} details The default properties of a user
-					 * @param {String} details.nickname The nickname of the user
-					 * @param {String} details.avatar URL to the avatar
-					 */
-					initialize: function( details ){
-						if (!details || !details.nickname || !details.avatar ){
-							throw "Invalid details";
-						}
+					url: function(){
+						return "/user/" + this.get("nickname");
 					}
 			})
+		,	url: '/users/'
+		, join: function(details){
+				this.add(new this.model(details));
+			}
 	});
 	
 	/**
@@ -234,6 +240,27 @@
 							EventedParser.once("account:created", function(data){
 								if( data && data.validates ){
 									$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
+									
+									// Register a new acount
+									Outsiders.join({
+										nickname: data.nickname
+									, avatar: data.avatar
+									, rooms: data.rooms
+									, me: true // \o/ yup, it's me
+									});
+									
+									// Check if there are already some users in the channel, if this is the
+									// case, lets add them :)
+									if (data.roommates && data.roommates.length){
+										var i = data.roommates.length;
+										while(i--){
+											Outsiders.join({
+												nickname: data.roommates[i].nickname
+											,	avatar: data.roommates[i].avatar
+											, rooms: data.rooms // we share the same rooms 
+											})
+										}
+									}
 								} else {
 									alert(data ? data.message : "Unable to validate the nickname")
 								}
@@ -284,7 +311,8 @@
 	/**
 	 * Initiate `Outside` application
 	 */
-	var Application = new Outside();
+	var Application = new Outside()
+		, Outsiders = new PotentialFriends();
 		
 	Backbone.history.start();
 	
@@ -293,5 +321,8 @@
 	if (!location.hash) Application.saveLocation("/"), Backbone.history.loadUrl();
 	
 	// only expose an external API when we are in development mode
-	if (development) window.Application = Application;
+	if (development){
+		Application.Outsiders = Outsiders;
+		window.Application = Application;
+	}
 }(location.port === "8908"));

@@ -132,7 +132,7 @@ io.on('connection', function( client ){
 		
 		// subscribe to a channel and notify the user
 		channel.subscribe(client);
-		client.filter({ type:'account:created', users: channel.roommates(client), validates: true, avatar: client.avatar });
+		client.filter({ type:'account:created', roommates: channel.roommates(client), validates: true, avatar: client.avatar });
 		
 		// announce that a new user has joined
 		io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details }, client));
