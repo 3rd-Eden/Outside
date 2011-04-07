@@ -104,11 +104,13 @@ io.on('connection', function( client ){
 			, validates;
 		
 		if( field == 'nickname' ){
+			// clean up the value
+			value = value.trim().toLowerCase();
 			if (value.length < 2 || value.length >= 24 ) return client.filter({type:"check:nickname", validates:false, message: value.length < 2 ? "Your nickname is to short" : "Your nickname is to long", field: field, value: value });
 			
 			temp = channel.users();
 			validates = temp.indexOf( value ) === -1;
-			client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', users: temp, field: field, value: value })
+			client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', field: field, value: data.value })
 		}
 	});
 	
@@ -124,6 +126,11 @@ io.on('connection', function( client ){
 		
 		if (!data.nickname || !data.email || typeof data.nickname !== 'string' || typeof data.email !== 'string')
 			return client.filter({ type:'account:created', validates:false, message:'Unable to create a account, make sure you filled in all details' });
+		
+		// validate the details
+		data.nickname = data.nickname.trim().toLowerCase();
+		if (channel.users().indexOf(data.nickname) !== -1)
+			return client.filter({ type:'account:created', validates:false, message:'Nickname already exists'});
 		
 		// the account details are validating, so setup the actual account
 		client.nickname = data.nickname;

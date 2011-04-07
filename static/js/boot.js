@@ -239,8 +239,6 @@
 							
 							EventedParser.once("account:created", function(data){
 								if( data && data.validates ){
-									$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
-									
 									// Register a new acount
 									Outsiders.join({
 										nickname: data.nickname
@@ -261,6 +259,9 @@
 											})
 										}
 									}
+									
+									// update the view
+									$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
 								} else {
 									alert(data ? data.message : "Unable to validate the nickname")
 								}
@@ -268,20 +269,25 @@
 							
 							EventedParser.createAccount(nickname, email);
 					}
-			});
-			
-			/*
-			// NOTE: the following lines of code are only used during development, need to find a more
-			// elegant solution for this instead of chaining the shit out of it
-			$(".auth .regular button").click(function login(e){
-				e && e.preventDefault()
-				$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
-			});
-			
-			$("aside.details h4 a").click(function realtime(e){
-				var self = $(this);
-				self.hasClass("realtime") ? self.removeClass("realtime").addClass("realtime-enabled") : self.removeClass("realtime-enabled").addClass("realtime")
-			});*/
+				})
+				
+			,	autovalidate = function(data){
+					if (data.value !== nickname.val() ) return; // out of date
+					
+					if ( data.validates ){
+						console.log("Winning")
+					} else {
+						console.log(data.message);
+					}
+				}
+			, nickname = form.find('input[name="nickname"]')
+											 .live("blur", function(){ EventedParser.removeListener("check:nickname", autovalidate ) })
+											 .live("focus", function(){ EventedParser.on("check:nickname", autovalidate)})		
+											 .live("keyup", function(){
+												 var value = nickname.val();
+												 if (value.length >= 3 )
+											 	 	 EventedParser.check("nickname", value);
+											 })
 		},
 		
 		/**
