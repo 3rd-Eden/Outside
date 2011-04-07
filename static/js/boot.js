@@ -271,23 +271,45 @@
 					}
 				})
 				
+				/**
+				 * Check if our submitted nickname validates on the server
+				 * When we are checking make sure that the value of the
+				 * server matches the value of the nickname input. 
+				 *
+				 * @param {Object} data The response from the server
+				 *
+				 * @api private
+				 */
 			,	autovalidate = function(data){
 					if (data.value !== nickname.val() ) return; // out of date
-					
 					if ( data.validates ){
-						console.log("Winning")
+						nickname.val(data.nickname); // update with a cleaned nickname
 					} else {
 						console.log(data.message);
 					}
 				}
+				
+				/**
+				 * As we require the user to enter a username, it would be quite nice to also
+				 * have real time validation of their nickname, we can use the established Socket.IO
+				 * connection to send the typed values to the server for processing.. 
+				 * 
+				 * When a user focuses the nickname input, we will add new listener for the `check:nickname`
+				 * notifications. 
+				 *
+				 * When a user leaves the nickname input, we will remove the assigned listener
+				 *
+				 * When a user types more than 3 charactures in the input field, we are going to send the data
+				 * to the server, where escaping and checking is done.
+				 */
 			, nickname = form.find('input[name="nickname"]')
-											 .live("blur", function(){ EventedParser.removeListener("check:nickname", autovalidate ) })
-											 .live("focus", function(){ EventedParser.on("check:nickname", autovalidate)})		
-											 .live("keyup", function(){
-												 var value = nickname.val();
-												 if (value.length >= 3 )
-											 	 	 EventedParser.check("nickname", value);
-											 })
+				 .live("blur", function(){ EventedParser.removeListener("check:nickname", autovalidate ) })
+				 .live("focus", function(){ EventedParser.on("check:nickname", autovalidate)})		
+				 .live("keyup", function(){
+					 var value = nickname.val();
+					 if (value.length >= 3 )
+						 EventedParser.check("nickname", value);
+				 });
 		},
 		
 		/**

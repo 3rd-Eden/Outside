@@ -110,7 +110,7 @@ io.on('connection', function( client ){
 			
 			temp = channel.users();
 			validates = temp.indexOf( value ) === -1;
-			client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', field: field, value: data.value })
+			client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', field: field, value: data.value, nickname: value })
 		}
 	});
 	
