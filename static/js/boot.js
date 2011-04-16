@@ -224,7 +224,6 @@
 			
 			EventedParser.register(this.io);
 			
-			// Add a form handler for the .auth panel because this can be accesed using 2 different urls
 			var self = this
 				, form = $(".auth form").live("submit", function(e){
 						e && e.preventDefault();
@@ -234,8 +233,14 @@
 							nickname = form.find('input[name="nickname"]').val();
 							email = form.find('input[name="email"]').val();
 							
-							if (nickname === '') return alert('Nickname is required');
-							if (email === '') return alert('Your e-mail address is required');
+							if (!nickname){
+								$('.auth label[for="nickname"]').find('span').remove().end().append('<span class="invalid">Nicknames are required</span>').next().addClass('invalid')
+							}
+							if (!email){
+								$('.auth label[for="email"]').find('span').remove().end().append('<span class="invalid">Email address is required</span>').next().addClass('invalid')
+							}
+							
+							if( !email || !nickname ) return; // return later, so we know all "validations" are toggled
 							
 							EventedParser.once("account:created", function(data){
 								if( data && data.validates ){
@@ -261,7 +266,7 @@
 									}
 									
 									// update the view
-									$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
+									window.location.hash = "/hello/" + data.nickname;
 								} else {
 									alert(data ? data.message : "Unable to validate the nickname")
 								}
@@ -269,8 +274,19 @@
 							
 							EventedParser.createAccount(nickname, email);
 					}
-				})
-				
+				});
+		},
+		
+		/**
+		 * The inital sign up page
+		 */
+		loaded: function(){
+			this.state = 'auth';
+			$(".auth form").find(".regular").show().end().find(".services").hide();
+			
+			if (this.environment.initiatedSignup) return;
+			var self = this
+				, form = $(".auth form")
 				/**
 				 * Check if our submitted nickname validates on the server
 				 * When we are checking make sure that the value of the
@@ -282,10 +298,22 @@
 				 */
 			,	autovalidate = function(data){
 					if (data.value !== nickname.val() ) return; // out of date
-					if ( data.validates ){
+					
+					var parent = nickname.parent()
+						, label = nickname.parents('fieldset').find('label[for="' + nickname[0].id + '"]');
+					
+					// remove old instance
+					label.find('span').remove();
+									
+					if (data.validates){
 						nickname.val(data.nickname); // update with a cleaned nickname
+						parent.removeClass('invalid').addClass('valid');
+						label.append('<span class="valid">Nickname available</span>');
+						$('.auth dd.nickname').html(data.nickname);
 					} else {
-						console.log(data.message);
+						parent.removeClass('valid').addClass('invalid');
+						label.append('<span class="invalid">' + data.message + '</span>');
+						$('.auth dd.nickname').html('Anonymous!');
 					}
 				}
 				
@@ -303,28 +331,45 @@
 				 * to the server, where escaping and checking is done.
 				 */
 			, nickname = form.find('input[name="nickname"]')
-				 .live("blur", function(){ EventedParser.removeListener("check:nickname", autovalidate ) })
-				 .live("focus", function(){ EventedParser.on("check:nickname", autovalidate)})		
+				 .live("blur", function(){
+						EventedParser.removeListener("check:nickname", autovalidate);
+						
+						var parent = nickname.parent().removeClass('focus')
+							, label = nickname.parents('fieldset').find('label[for="' + nickname[0].id + '"]');
+							
+						if (nickname.val().length < 3) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Your nickname is required</span>');
+					})
+				 .live("focus", function(){
+				 	  EventedParser.on("check:nickname", autovalidate);
+						nickname.parent().addClass('focus');
+					})
 				 .live("keyup", function(){
 					 var value = nickname.val();
 					 if (value.length >= 3 )
 						 EventedParser.check("nickname", value);
+				 })
+			,	email = form.find('input[name="email"]')
+				 .live("blur", function(){
+				 
+				 })
+				 .live("focus", function(){
+				 
+				 })
+				 .live("keyup", function(){
+				 
 				 });
+			
+			// we are done, so flag it
+			this.environment.initiatedSignup = true;
 		},
 		
 		/**
-		 * The inital sign up page
+		 * Start the chatbox magic
 		 */
-		loaded: function(){
-			this.state = 'auth';
-			$(".auth form").find(".regular").show().end().find(".services").hide();
-			
-		},
-		
 		setup: function(nickname){
-			//this.io
+			this.state = 'loggedin';
+			$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
 		},
-		
 		
 		service: function(type){
 			this.state = 'auth:service';
@@ -332,7 +377,7 @@
 			alert("zomg, service fails, login using a normal acount, kay?");
 			// ignore the awful chaining, this is just a filty hack
 			if (!type) 
-				$(".auth form").find(".regular").hide().end().find(".services").show()
+				$(".auth form").find(".regular").hide().end().find(".services").show();
 		}
 	});
 		
@@ -344,9 +389,8 @@
 		
 	Backbone.history.start();
 	
-	// if the hash `#/` isn't set, we are going to load it, so our "loaded" method
-	// is called.
-	if (!location.hash) Application.saveLocation("/"), Backbone.history.loadUrl();
+	// Move us to our first start point
+	Application.saveLocation("/"), Backbone.history.loadUrl();
 	
 	// only expose an external API when we are in development mode
 	if (development){

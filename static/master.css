@@ -40,9 +40,19 @@ box-shadow: inset 0 -1px 0px #79c452, inset 0 1px 6px rgba(0,0,0,0.24); -moz-box
 text-shadow: 0px -1px 0px #4f8f34; color: #FFF;
 -webkit-transition: all 0.05s ease-in-out;
 }
-/**/
+
+/* General styles */
 .input { background:#edf2f3; display:inline-block; padding:4px; border-radius:5px; display: table; }
 	.input input { padding:5px; width:300px; border:1px solid #9fa5af; height:20px; box-shadow: inset 0 1px 6px rgba(0,0,0,0.1); border-radius:3px; display: table-cell; }
+
+.input.focus { background-color:#fffde2 }
+	.input.focus input { border-color:#fae9ae }
+
+.input.valid { background-color:#e9f3d9 }
+	.input.valid input { border-color:#488b2e; color:#488b2e }
+	
+.input.invalid { background-color:#fbd9da }
+	.input.invalid input { border-color:#d68398; color:#881834 }
 
 /* app layout */
 #masthead { background: url(i/top_bar.png) repeat-x 0 0; display: table; position: absolute; top: 0; width: 100%; min-width: 640px; color: #FFF; text-shadow: 0px 1px 0px #4f8f34;  height: 60px; }
@@ -72,7 +82,10 @@ text-shadow: 0px -1px 0px #4f8f34; color: #FFF;
  /* defaults */
  .auth { position:fixed; top:50%; left:50%; width:700px; height:280px; margin-top:-140px; margin-left:-350px; background:#fff }
  	.auth form { width:350px; height:280px; float:left; color:#a2aeb1; border-right:1px solid #c3c7ce }
-		.auth label { display:block; margin:25px 0 10px }
+		.auth label { display:block; margin:25px 0 10px; overflow:hidden }
+			.auth label span { float:right; margin-right:35px }
+				.auth label span.invalid { color:#881834 }
+				.auth label span.valid { color:#488b2e }
 
 	/* left sections */
 	.auth .regular, .auth .services { border-right:2px solid #edf2f3; height:280px; overflow:hidden }

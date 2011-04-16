@@ -82,7 +82,7 @@ io.on('connection', function( client ){
 	 * @param {Ojbect} data The message from the client
 	 * @api private
 	 */
-	client.on( 'message', function( data ){
+	client.on( 'message', function(data){
 		if ( data && data.type && typeof data.type === 'string' && !/message|connect|disconnect/.test( data.type ) ){
 			return client.emit(data.type, data);
 		} else {
@@ -97,20 +97,27 @@ io.on('connection', function( client ){
 	 * @param {Object} data The data object that needs his fields and values validated
 	 * @api private
 	 */
-	client.on( 'validate:check', function( data ){
+	client.on( 'validate:check', function(data){
 		var field = '' + data.field
 			, value = '' + data.value
 			, temp
 			, validates;
 		
-		if( field == 'nickname' ){
+		if (field == 'nickname'){
 			// clean up the value
 			value = value.trim().toLowerCase();
 			if (value.length < 2 || value.length >= 24 ) return client.filter({type:"check:nickname", validates:false, message: value.length < 2 ? "Your nickname is to short" : "Your nickname is to long", field: field, value: value });
 			
 			temp = channel.users();
-			validates = temp.indexOf( value ) === -1;
+			validates = temp.indexOf(value) === -1;
 			client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', field: field, value: data.value, nickname: value })
+		} else if (field == 'email'){
+			if (!/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a -z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(value) ){
+				//'// basic regexp test
+				client.filter({ type: 'check:email', validates: false, message: 'Incorrect e-mail address', field: field, value: value });
+			} else {
+				client.filter({ type: 'check:email', validates: true, gravatar: gravatar.url(value, {s:48, r:'pg', d: '404'}), field: field, value: value });
+			}
 		}
 	});
 	
@@ -121,7 +128,7 @@ io.on('connection', function( client ){
 	 * @param {Object} data The data used to create an account
 	 * @api private
 	 */
-	client.on( 'account:create', function( data ){
+	client.on( 'account:create', function(data){
 		if (client.nickname) return false;
 		
 		if (!data.nickname || !data.email || typeof data.nickname !== 'string' || typeof data.email !== 'string')
