@@ -93,6 +93,7 @@
 		proxy: {
 			// validation and registration
 			'check:nickname':	 	'check:nickname',
+			'check:email':			'check:email',
 			'account:created':	'account:created',
 			
 			// messages
@@ -287,6 +288,7 @@
 			if (this.environment.initiatedSignup) return;
 			var self = this
 				, form = $(".auth form")
+				
 				/**
 				 * Check if our submitted nickname validates on the server
 				 * When we are checking make sure that the value of the
@@ -296,7 +298,7 @@
 				 *
 				 * @api private
 				 */
-			,	autovalidate = function(data){
+			,	nickvalidate = function(data){
 					if (data.value !== nickname.val() ) return; // out of date
 					
 					var parent = nickname.parent()
@@ -332,7 +334,7 @@
 				 */
 			, nickname = form.find('input[name="nickname"]')
 				 .live("blur", function(){
-						EventedParser.removeListener("check:nickname", autovalidate);
+						EventedParser.removeListener("check:nickname", nickvalidate);
 						
 						var parent = nickname.parent().removeClass('focus')
 							, label = nickname.parents('fieldset').find('label[for="' + nickname[0].id + '"]');
@@ -340,7 +342,7 @@
 						if (nickname.val().length < 3) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Your nickname is required</span>');
 					})
 				 .live("focus", function(){
-				 	  EventedParser.on("check:nickname", autovalidate);
+				 	  EventedParser.on("check:nickname", nickvalidate);
 						nickname.parent().addClass('focus');
 					})
 				 .live("keyup", function(){
@@ -348,15 +350,46 @@
 					 if (value.length >= 3 )
 						 EventedParser.check("nickname", value);
 				 })
+				 
+				/**
+				 *
+				 */
+			,	emailvalidate = function(data){
+					if (data.value !== email.val() ) return; // out of date
+					
+					var parent = email.parent()
+						, label = email.parents('fieldset').find('label[for="' + email[0].id + '"]');
+					
+					// remove old instance
+					label.find('span').remove();
+									
+					if (data.validates){
+						parent.removeClass('invalid').addClass('valid');
+						label.append('<span class="valid">Valid e-mail address</span>');
+						$('.auth dd.gravatar img').attr('src', data.gravatar);
+					} else {
+						parent.removeClass('valid').addClass('invalid');
+						label.append('<span class="invalid">' + data.message + '</span>');
+						$('.auth dd.gravatar img').attr('src', '/i/anonymous.png');
+					}
+				}
+				
 			,	email = form.find('input[name="email"]')
 				 .live("blur", function(){
-				 
+				 		EventedParser.removeListener("check:email", emailvalidate);
+						
+						var parent = email.parent().removeClass('focus')
+							, label = email.parents('fieldset').find('label[for="' + email[0].id + '"]');
+							
+						if (!email.val()) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Email address is required</span>');
 				 })
 				 .live("focus", function(){
-				 
+				 		EventedParser.on("check:email", emailvalidate);
 				 })
 				 .live("keyup", function(){
-				 
+				 		var value = email.val();
+					  if (value.length >= 3 )
+						  EventedParser.check("email", value);
 				 });
 			
 			// we are done, so flag it
