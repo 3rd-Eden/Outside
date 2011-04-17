@@ -197,7 +197,7 @@ aside.details { background: #fff; width:285px; min-width:285px; border-left:3px 
  */
 
 	.box form { display: block; width: 100%; }
-		.box form input { width: 100%; font-size:14px; font-weight:600; color:#656565; -webkit-box-shadow: 0 0 0 5px #edf2f3, inset 0 1px 6px rgba(0,0,0,0.1); padding:5px 0; text-indent: 5px; border:1px solid #9fa5af; height:20px; border-radius:3px; }
+		.box form input { width: 100%; font-size:14px; font-weight:600; color:#656565; -webkit-box-shadow: 0 0 0 5px #edf2f3, inset 0 1px 6px rgba(0,0,0,0.1); padding:5px 0 5px 5px; text-indent: 5px; border:1px solid #9fa5af; height:20px; border-radius:3px; }
 		
 		.box form .msg-input { padding: 12px; }
 		.box form .msg-send { width: 100px; display: table-cell; overflow: hidden; }

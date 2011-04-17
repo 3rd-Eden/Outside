@@ -44,7 +44,7 @@ app.configure(function(){
  * Setup the routers.
  */
 app.get("/", function(req, res){
-	res.render("index");
+	res.render("index", {stats:channel.count});
 });
 
 app.get("/*", function(req, res){
@@ -82,7 +82,7 @@ io.on('connection', function( client ){
 	 * @param {Ojbect} data The message from the client
 	 * @api private
 	 */
-	client.on( 'message', function(data){
+	client.on('message', function(data){
 		if ( data && data.type && typeof data.type === 'string' && !/message|connect|disconnect/.test( data.type ) ){
 			return client.emit(data.type, data);
 		} else {
@@ -97,7 +97,7 @@ io.on('connection', function( client ){
 	 * @param {Object} data The data object that needs his fields and values validated
 	 * @api private
 	 */
-	client.on( 'validate:check', function(data){
+	client.on('validate:check', function(data){
 		var field = '' + data.field
 			, value = '' + data.value
 			, temp
@@ -128,7 +128,7 @@ io.on('connection', function( client ){
 	 * @param {Object} data The data used to create an account
 	 * @api private
 	 */
-	client.on( 'account:create', function(data){
+	client.on('account:create', function(data){
 		if (client.nickname) return false;
 		
 		if (!data.nickname || !data.email || typeof data.nickname !== 'string' || typeof data.email !== 'string')
@@ -146,6 +146,7 @@ io.on('connection', function( client ){
 		
 		// subscribe to a channel and notify the user
 		channel.subscribe(client);
+		client.on("disconnect", function(){ channel.unsubscribe(client) });
 		client.filter({ type:'account:created', roommates: channel.roommates(client), validates: true, avatar: client.avatar });
 		
 		// announce that a new user has joined

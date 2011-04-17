@@ -45,7 +45,10 @@
 			})
 		,	url: '/users/'
 		, join: function(details){
-				this.add(new this.model(details));
+				var friend = new this.model(details);
+				this.add(friend);
+				
+				return friend;
 			}
 	});
 	
@@ -246,12 +249,14 @@
 							EventedParser.once("account:created", function(data){
 								if( data && data.validates ){
 									// Register a new acount
-									Outsiders.join({
+									this.me = Outsiders.join({
 										nickname: data.nickname
 									, avatar: data.avatar
 									, rooms: data.rooms
 									, me: true // \o/ yup, it's me
 									});
+									
+									this.me.account = data;
 									
 									// Check if there are already some users in the channel, if this is the
 									// case, lets add them :)
@@ -269,7 +274,7 @@
 									// update the view
 									window.location.hash = "/hello/" + data.nickname;
 								} else {
-									alert(data ? data.message : "Unable to validate the nickname")
+									alert(data ? data.message : "Unable to validate the nickname");
 								}
 							});
 							
@@ -347,12 +352,13 @@
 					})
 				 .live("keyup", function(){
 					 var value = nickname.val();
-					 if (value.length >= 3 )
+					 if (value.length >= 3)
 						 EventedParser.check("nickname", value);
 				 })
 				 
 				/**
-				 *
+				 * Checks if we have valid email address, this is also validated on
+				 * the server side so we can generate a gravatar compatible URL
 				 */
 			,	emailvalidate = function(data){
 					if (data.value !== email.val() ) return; // out of date
@@ -413,7 +419,9 @@
 				$(".auth form").find(".regular").hide().end().find(".services").show();
 		}
 	});
-		
+	
+	// reset hash state
+	window.location.hash = '#/';
 	/**
 	 * Initiate `Outside` application
 	 */
@@ -422,12 +430,15 @@
 		
 	Backbone.history.start();
 	
-	// Move us to our first start point
-	Application.saveLocation("/"), Backbone.history.loadUrl();
-	
 	// only expose an external API when we are in development mode
 	if (development){
 		Application.Outsiders = Outsiders;
 		window.Application = Application;
+		
+		// dummy data, aka OMFG chain madness
+		false && $(document.body)
+			.find('input[name="nickname"]').val('example').end()
+			.find('input[name="email"]').val('info@3rd-Eden.com').end()
+			.find('.auth form').trigger('submit').end()
 	}
 }(location.port === "8908"));
