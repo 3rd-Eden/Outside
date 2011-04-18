@@ -206,4 +206,19 @@ aside.details { background: #fff; width:285px; min-width:285px; border-left:3px 
  * messages
  */
 
-.messages .me { background:#fff; border:3px solid #edf2f3; padding:10px 35px 10px 10px }
+.messages article { overflow:hidden; position:relative }
+	/* my messages */
+	.messages .me { background:#fff; border:3px solid #edf2f3; padding:10px 35px 10px 10px }
+		.messages .me dl { float:right }
+			.messages .me .nickname { color:#5ca63d }
+			.messages .me .gravatar { float:right; margin-left:10px }
+	
+	/* others messages */
+	.messages .other .nickname { margin-left:62px }
+	
+	/* common messages */
+	.messages .gravatar { float:left; margin-top: -52px }
+	.messages .gravatar img { background:#fff; padding:2px; border:1px solid #d0d0d0 }
+	.messages .nickname { font-weight:600; display:inline }
+	.messages .time { display: inline }
+	.messages dl { margin-top:50px; float:left }
