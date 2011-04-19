@@ -152,6 +152,21 @@ io.on('connection', function( client ){
 		// announce that a new user has joined
 		io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details }, client));
 	});
+	
+	// handle messages from the clients
+	client.on('comment', function(data){
+		var clean = channel.filter(data, client)
+			, words = clean.message.split( /\s+/g ).length;
+		
+		client.details.lines = client.details.lines ? client.details.lines + 1 : 1;
+		client.details.words = client.details.words ? client.details.words + words : words;
+		client.rooms && io.publish(client, client.rooms, clean);
+	});
+	
+	// forwards!
+	client.on('private', function(data){
+		channel.private(data,client);
+	});
 });
 /*
 io.on("connection", function(client){

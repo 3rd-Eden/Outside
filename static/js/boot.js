@@ -45,6 +45,10 @@
 			})
 		,	url: '/users/'
 		, join: function(details){
+				// create a id attribute if it doesn't exist so we can
+				// find them this user back
+				details.id = details.id || details.nickname;
+				
 				var friend = new this.model(details);
 				this.add(friend);
 				
@@ -139,7 +143,7 @@
 			 * @api public
 			 */
 			private: function(to, message){
-				 io.send({type:'private', to: to, message: message.toString(), nickname: EventedParser.io.nickname});
+				 EventedParser.io.send({type:'private', to: to, message: message.toString(), nickname: EventedParser.io.nickname});
 			},
 			
 			/**
@@ -150,7 +154,7 @@
 			 * @api public
 			 */
 			blacklist: function(nickname){
-				io.send({type:'blacklist', blacklist:nickname.toString(), nickname: EventedParser.io.nickname});
+				EventedParser.io.send({type:'blacklist', blacklist:nickname.toString(), nickname: EventedParser.io.nickname});
 			},
 			
 			/**
@@ -161,39 +165,42 @@
 			 * @api public
 			 */
 			send: function(message){
-				var request = {type:'message', message: message.toString(), nickname: io.nickname, rooms: io.rooms};
-				io.send(request);
-				EventedPaser.emit('channel:message', request)
-			}
-		},
-		
-		/**
-		 * Sends a check to the server to validate the field and value, this is needed
-		 * because we will be working with allot of concurrent users and double values may not
-		 * be permitted by the server instance.
-		 *
-		 * @param {String} field The field that needs to be validated
-		 * @param {String} value The value of the field
-		 *
-		 * @api public
-		 */
-		check: function(field,value){
-			this.io.send({type:'validate:check', field:field, value:value})
-		},
-		
-		/**
-		 * Create a new account the server
-		 *
-		 * @param {String} nickname The nickname for the chat
-		 * @param {String} email The email address
-		 *	
-		 * @api public
-		 */
-		createAccount: function(nickname, email){
-			nickname = '' + nickname;
-			email = '' + email;
+				// clean the message
+				message.replace
+				
+				var request = {type:'comment', message: message.toString(), nickname: io.nickname, rooms: io.rooms};
+				
+				EventedParser.io.send(request);
+			},
 			
-			this.io.send({type: 'account:create', nickname: nickname, email:email });
+			/**
+			 * Sends a check to the server to validate the field and value, this is needed
+			 * because we will be working with allot of concurrent users and double values may not
+			 * be permitted by the server instance.
+			 *
+			 * @param {String} field The field that needs to be validated
+			 * @param {String} value The value of the field
+			 *
+			 * @api public
+			 */
+			check: function(field,value){
+				EventedParser.io.send({type:'validate:check', field:field, value:value})
+			},
+			
+			/**
+			 * Create a new account the server
+			 *
+			 * @param {String} nickname The nickname for the chat
+			 * @param {String} email The email address
+			 *	
+			 * @api public
+			 */
+			createAccount: function(nickname, email){
+				nickname = '' + nickname;
+				email = '' + email;
+				
+				EventedParser.io.send({type: 'account:create', nickname: nickname, email:email });
+			}
 		}
 	};
 	_.extend(EventedParser, Backbone.Events);
@@ -278,7 +285,7 @@
 								}
 							});
 							
-							EventedParser.createAccount(nickname, email);
+							EventedParser.API.createAccount(nickname, email);
 					}
 				});
 		},
@@ -354,7 +361,7 @@
 				 .live('keyup', function(){
 					 var value = nickname.val();
 					 if (value.length >= 3)
-						 EventedParser.check('nickname', value);
+						 EventedParser.API.check('nickname', value);
 				 })
 				 
 				/**
@@ -396,7 +403,7 @@
 				 .live('keyup', function(){
 				 		var value = email.val();
 					  if (value.length >= 3 )
-						  EventedParser.check('email', value);
+						  EventedParser.API.check('email', value);
 				 });
 			
 			// we are done, so flag it
@@ -409,12 +416,52 @@
 		setup: function(nickname){
 			var self = this
 				, me = self.me
-				, account = me.account;
+				, account = me.account
+				, box = $('.box');
 			
 			this.state = 'loggedin';
 			
+			// Add the listeners
+			EventedParser.on('private', function(){
+				// handle private messages
+			});
+			EventedParser.on('announcement', function(){
+				// handle announcements
+			});
+			EventedParser.on('heartbeat', function(){
+				// handle heartbeats from the server
+			});
+			EventedParser.on('comment', function(){
+			
+			});
+			
+			EventedParser.on('user:join', function(data){
+				Outsiders.join({
+					nickname: data.nickname
+				,	avatar: data.avatar
+				, rooms: data.rooms // we share the same rooms 
+				});
+				
+			});
+			EventedParser.on('user:depart', function(data){
+				Outsiders.remove(data.nickname)
+			});
+			EventedParser.on('user:nickchange', function(){});
+			
 			// prepare the application interface
 			$('#masthead .salut a').html(account.nickname).attr('href', '#/details/' + account.nickname);
+			
+			// attach the event listeners
+			box.find('form[name="chat"]').live("submit", function(e){
+				e && e.preventDefault();
+				
+				var $self = $(this)
+					, input = $self.find('input[name="message"]');
+					
+				EventedParser.API.send(input.val());
+					
+				input.val(''); // clear the value
+			});
 			
 			// now that all UI changes are made, we can make the application visable, this way we don't
 			// trigger unnessesary reflows + paint events in the browser.
