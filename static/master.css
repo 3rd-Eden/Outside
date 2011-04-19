@@ -56,11 +56,13 @@ text-shadow: 0px -1px 0px #4f8f34; color: #FFF;
 
 /* app layout */
 #masthead { background: url(i/top_bar.png) repeat-x 0 0; display: table; position: absolute; top: 0; width: 100%; min-width: 640px; color: #FFF; text-shadow: 0px 1px 0px #4f8f34;  height: 60px; }
-#masthead h1, #masthead nav { display: table-cell; vertical-align: middle; padding: 0 22px;  }
-#masthead a { font-weight: bold; color: #FFF; text-decoration: none; }
-	#masthead nav ul { float: right; }
-	#masthead .salut { color: #dff3c0; padding-right: 24px; }
-		#masthead .salut a { margin-left: 0.5em; }
+	#masthead h1, 
+	.loggedin #masthead nav { display: table-cell; vertical-align: middle; padding: 0 22px;  }
+	#masthead nav { display:none }
+	#masthead a { font-weight: bold; color: #FFF; text-decoration: none; }
+		#masthead ul { float: right; }
+		#masthead .salut { color: #dff3c0; padding-right: 24px; }
+			#masthead .salut a { margin-left: 0.5em; }
 
 .loggedin div.app { overflow: hidden; width: 100%; display: table }
 	.box, .users, aside.details { display: table-cell; }

@@ -40,7 +40,7 @@
 	var PotentialFriends = Backbone.Collection.extend({
 			model: Backbone.Model.extend({
 					url: function(){
-						return "/user/" + this.get("nickname");
+						return '/user/' + this.get('nickname');
 					}
 			})
 		,	url: '/users/'
@@ -66,7 +66,7 @@
 		 */
 		response: function(response){
 			development && console.dir( response );
-			if (response.type && typeof response.type === "string" && EventedParser.proxy[ response.type ]){
+			if (response.type && typeof response.type === 'string' && EventedParser.proxy[ response.type ]){
 				if ('meta' in response && EventedParser.proxy[response.meta])
 					return EventedParser.trigger(EventedParser.proxy[response.meta], response);
 				
@@ -83,7 +83,7 @@
 		 */
 		register: function(io){
 			this.io = io;
-			this.io.on("message", this.response);
+			this.io.on('message', this.response);
 		},
 		
 		/**
@@ -127,7 +127,7 @@
 			 * @api public
 			 */
 			nickname: function(nickname){
-				EventedParser.io.send({type:"nickname", nickname:nickname.toString()});
+				EventedParser.io.send({type:'nickname', nickname:nickname.toString()});
 			},
 			
 			/**
@@ -139,7 +139,7 @@
 			 * @api public
 			 */
 			private: function(to, message){
-				 io.send({type:"private", to: to, message: message.toString(), nickname: EventedParser.io.nickname});
+				 io.send({type:'private', to: to, message: message.toString(), nickname: EventedParser.io.nickname});
 			},
 			
 			/**
@@ -150,7 +150,7 @@
 			 * @api public
 			 */
 			blacklist: function(nickname){
-				io.send({type:"blacklist", blacklist:nickname.toString(), nickname: EventedParser.io.nickname});
+				io.send({type:'blacklist', blacklist:nickname.toString(), nickname: EventedParser.io.nickname});
 			},
 			
 			/**
@@ -161,9 +161,9 @@
 			 * @api public
 			 */
 			send: function(message){
-				var request = {type:"message", message: message.toString(), nickname: io.nickname, rooms: io.rooms};
+				var request = {type:'message', message: message.toString(), nickname: io.nickname, rooms: io.rooms};
 				io.send(request);
-				EventedPaser.emit("channel:message", request)
+				EventedPaser.emit('channel:message', request)
 			}
 		},
 		
@@ -178,7 +178,7 @@
 		 * @api public
 		 */
 		check: function(field,value){
-			this.io.send({type:"validate:check", field:field, value:value})
+			this.io.send({type:'validate:check', field:field, value:value})
 		},
 		
 		/**
@@ -186,14 +186,14 @@
 		 *
 		 * @param {String} nickname The nickname for the chat
 		 * @param {String} email The email address
-		 *
+		 *	
 		 * @api public
 		 */
 		createAccount: function(nickname, email){
 			nickname = '' + nickname;
 			email = '' + email;
 			
-			this.io.send({type: "account:create", nickname: nickname, email:email });
+			this.io.send({type: 'account:create', nickname: nickname, email:email });
 		}
 	};
 	_.extend(EventedParser, Backbone.Events);
@@ -209,9 +209,9 @@
 		 * Setup the routes -> locations
 		 */
 		routes: {
-			"/": 											"loaded",
-			"/signup/service/:type": 	"service",
-			"/hello/:nickname": 			"setup"
+			'/': 											'loaded',
+			'/signup/service/:type': 	'service',
+			'/hello/:nickname': 			'setup'
 		},
 		
 		/**
@@ -219,7 +219,7 @@
 		 * has been created. The connection is established using `Socket.IO`
 		 */
 		initialize: function(){
-			development && console.log("Application loaded");
+			development && console.log('Application loaded');
 			
 			this.state = 'auth';
 			this.io = new io.Socket(null, { rememberTransport:false });
@@ -229,7 +229,7 @@
 			EventedParser.register(this.io);
 			
 			var self = this
-				, form = $(".auth form").live("submit", function(e){
+				, form = $('.auth form').live('submit', function(e){
 						e && e.preventDefault();
 						
 						var nickname, email;
@@ -244,19 +244,19 @@
 								$('.auth label[for="email"]').find('span').remove().end().append('<span class="invalid">Email address is required</span>').next().addClass('invalid')
 							}
 							
-							if( !email || !nickname ) return; // return later, so we know all "validations" are toggled
+							if( !email || !nickname ) return; // return later, so we know all 'validations' are toggled
 							
-							EventedParser.once("account:created", function(data){
+							EventedParser.once('account:created', function(data){
 								if( data && data.validates ){
 									// Register a new acount
-									this.me = Outsiders.join({
+									self.me = Outsiders.join({
 										nickname: data.nickname
 									, avatar: data.avatar
 									, rooms: data.rooms
 									, me: true // \o/ yup, it's me
 									});
 									
-									this.me.account = data;
+									self.me.account = data;
 									
 									// Check if there are already some users in the channel, if this is the
 									// case, lets add them :)
@@ -272,9 +272,9 @@
 									}
 									
 									// update the view
-									window.location.hash = "/hello/" + data.nickname;
+									window.location.hash = '/hello/' + data.nickname;
 								} else {
-									alert(data ? data.message : "Unable to validate the nickname");
+									alert(data ? data.message : 'Unable to validate the nickname');
 								}
 							});
 							
@@ -288,11 +288,12 @@
 		 */
 		loaded: function(){
 			this.state = 'auth';
-			$(".auth form").find(".regular").show().end().find(".services").hide();
+			$('.auth form').find('.regular').show().end().find('.services').hide();
 			
 			if (this.environment.initiatedSignup) return;
+			
 			var self = this
-				, form = $(".auth form")
+				, form = $('.auth form')
 				
 				/**
 				 * Check if our submitted nickname validates on the server
@@ -338,22 +339,22 @@
 				 * to the server, where escaping and checking is done.
 				 */
 			, nickname = form.find('input[name="nickname"]')
-				 .live("blur", function(){
-						EventedParser.removeListener("check:nickname", nickvalidate);
+				 .live('blur', function(){
+						EventedParser.removeListener('check:nickname', nickvalidate);
 						
 						var parent = nickname.parent().removeClass('focus')
 							, label = nickname.parents('fieldset').find('label[for="' + nickname[0].id + '"]');
 							
 						if (nickname.val().length < 3) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Your nickname is required</span>');
 					})
-				 .live("focus", function(){
-				 	  EventedParser.on("check:nickname", nickvalidate);
+				 .live('focus', function(){
+				 	  EventedParser.on('check:nickname', nickvalidate);
 						nickname.parent().addClass('focus');
 					})
-				 .live("keyup", function(){
+				 .live('keyup', function(){
 					 var value = nickname.val();
 					 if (value.length >= 3)
-						 EventedParser.check("nickname", value);
+						 EventedParser.check('nickname', value);
 				 })
 				 
 				/**
@@ -381,21 +382,21 @@
 				}
 				
 			,	email = form.find('input[name="email"]')
-				 .live("blur", function(){
-				 		EventedParser.removeListener("check:email", emailvalidate);
+				 .live('blur', function(){
+				 		EventedParser.removeListener('check:email', emailvalidate);
 						
 						var parent = email.parent().removeClass('focus')
 							, label = email.parents('fieldset').find('label[for="' + email[0].id + '"]');
 							
 						if (!email.val()) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Email address is required</span>');
 				 })
-				 .live("focus", function(){
-				 		EventedParser.on("check:email", emailvalidate);
+				 .live('focus', function(){
+				 		EventedParser.on('check:email', emailvalidate);
 				 })
-				 .live("keyup", function(){
+				 .live('keyup', function(){
 				 		var value = email.val();
 					  if (value.length >= 3 )
-						  EventedParser.check("email", value);
+						  EventedParser.check('email', value);
 				 });
 			
 			// we are done, so flag it
@@ -406,17 +407,28 @@
 		 * Start the chatbox magic
 		 */
 		setup: function(nickname){
+			var self = this
+				, me = self.me
+				, account = me.account;
+			
 			this.state = 'loggedin';
-			$("html").addClass("loggedin").find(".auth").hide().end().find("div.app").show();
+			
+			// prepare the application interface
+			$('#masthead .salut a').html(account.nickname).attr('href', '#/details/' + account.nickname);
+			
+			// now that all UI changes are made, we can make the application visable, this way we don't
+			// trigger unnessesary reflows + paint events in the browser.
+			$('html').addClass('loggedin').find('.auth').hide().end().find('div.app').show();
+			
 		},
 		
 		service: function(type){
 			this.state = 'auth:service';
 			
-			alert("zomg, service fails, login using a normal acount, kay?");
+			alert('zomg, service fails, login using a normal acount, kay?');
 			// ignore the awful chaining, this is just a filty hack
 			if (!type) 
-				$(".auth form").find(".regular").hide().end().find(".services").show();
+				$('.auth form').find('.regular').hide().end().find('.services').show();
 		}
 	});
 	
@@ -441,4 +453,4 @@
 			.find('input[name="email"]').val('info@3rd-Eden.com').end()
 			.find('.auth form').trigger('submit').end()
 	}
-}(location.port === "8908"));
+}(location.port === '8908'));
