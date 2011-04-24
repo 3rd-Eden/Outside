@@ -1,5 +1,6 @@
 /**
- * Capture uncaughtExceptions at the top to capture.
+ * Capture uncaughtExceptions at the top to capture the whole initation
+ * process.
  */
 process.addListener( "uncaughtException", function captureException( err ){
 	console.log( err.stack.split( "\n" ) );
@@ -21,7 +22,7 @@ var Manager = require('./lib/manager')
  */
 require("./lib/io")(io);
 require("express-namespace");
-var app = express.createServer();
+var app = module.exports = express.createServer();
 
 /**
  * Configure the middleware for Express.
@@ -249,5 +250,10 @@ io.on("connection", function(client){
  */
 var channel = Manager(io);
 
-app.listen(8908);
-console.log("Listenering to post: " + 8908);
+/**
+ * 
+ */
+if(!module.parent){
+  app.listen(8908);
+  console.log("Listenering to post: " + 8908);
+}

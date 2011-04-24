@@ -209,7 +209,7 @@
 			send: function(message){
 				// clean the message
 				
-				var request = {type:'comment', message: message.toString(), nickname: io.nickname, rooms: io.rooms};
+				var request = {type:'comment', message: message.toString(), nickname: this.nickname, rooms: this.rooms, time: new Date()};
 				
 				EventedParser.io.send(request);
 				EventedParser.trigger('comment', request);
@@ -479,7 +479,7 @@
 				_.extend(data, Outsiders.get(data.nickname).attributes);
 				data.type = data.nickname === account.nickname ? 'me' : 'other';
 				
-				$('section.messages').append(render('comment', data));
+				$(render('comment', data)).insertBefore('section.messages ol.dots');
 			});
 			
 			EventedParser.on('user:join', function(data){
@@ -506,7 +506,7 @@
 				var $self = $(this)
 					, input = $self.find('input[name="message"]');
 					
-				EventedParser.API.send(input.val());
+				EventedParser.API.send.call(account,input.val());
 					
 				input.val(''); // clear the value
 			});
