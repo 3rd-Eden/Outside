@@ -158,6 +158,9 @@ io.on('connection', function( client ){
 		var clean = channel.filter(data, client)
 			, words = clean.message.split( /\s+/g ).length;
 		
+		// add a server based timestamp
+		clean.time = new Date();
+		
 		client.details.lines = client.details.lines ? client.details.lines + 1 : 1;
 		client.details.words = client.details.words ? client.details.words + words : words;
 		client.rooms && io.publish(client, client.rooms, clean);

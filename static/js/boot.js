@@ -33,6 +33,44 @@
 	 * @type {Function}
 	 */
 	 Backbone.sync = function(){};
+	 
+	/**
+	 * Thanks John; http://ejohn.org/blog/javascript-micro-templating
+	 */
+	var render = (function(){
+		var cache = {}
+			, tmpl = function tmpl(str, data){
+					// Figure out if we're getting a template, or if we need to
+					// load the template - and be sure to cache the result.
+					var fn = !/\W/.test(str) ?
+						cache[str] = cache[str] ||
+							tmpl(document.getElementById(str).innerHTML) :
+						
+						// Generate a reusable function that will serve as a template
+						// generator (and which will be cached).
+						new Function("obj",
+							"var p=[],print=function(){p.push.apply(p,arguments);};" +
+							
+							// Introduce the data as local variables using with(){}
+							"with(obj){p.push('" +
+							
+							// Convert the template into pure JavaScript
+							str
+								.replace(/[\r\t\n]/g, " ")
+								.split("[%").join("\t")
+								.replace(/((^|%\])[^\t]*)'/g, "$1\r")
+								.replace(/\t=(.*?)%\]/g, "',$1,'")
+								.split("\t").join("');")
+								.split("%]").join("p.push('")
+								.split("\r").join("\\'")
+						+ "');}return p.join('');");
+					
+					// Provide some basic currying to the user
+					return data ? fn( data ) : fn;
+				};
+					
+				return tmpl;
+		}());
 	
 	/**
 	 * A small user collection 
@@ -104,6 +142,11 @@
 			'account:created':	'account:created',
 			
 			// messages
+			'comment':					'comment',
+			'user:join':				'user:join',
+			
+			
+			// messages
 			'notice':				'notice',
 			'error':				'error',
 			
@@ -115,7 +158,6 @@
 			'message' : 		'channel:message',
 			'announcement': 'channel:announcement',
 			'nick:change': 	'channel:nickname',
-			'user:join':		'channel:join',
 			'user:depart':	'channel:depart',
 			
 			// status sync
@@ -166,11 +208,11 @@
 			 */
 			send: function(message){
 				// clean the message
-				message.replace
 				
 				var request = {type:'comment', message: message.toString(), nickname: io.nickname, rooms: io.rooms};
 				
 				EventedParser.io.send(request);
+				EventedParser.trigger('comment', request);
 			},
 			
 			/**
@@ -255,6 +297,7 @@
 							
 							EventedParser.once('account:created', function(data){
 								if( data && data.validates ){
+									
 									// Register a new acount
 									self.me = Outsiders.join({
 										nickname: data.nickname
@@ -431,11 +474,16 @@
 			EventedParser.on('heartbeat', function(){
 				// handle heartbeats from the server
 			});
-			EventedParser.on('comment', function(){
-			
+			EventedParser.on('comment', function(data){
+				// add more details
+				_.extend(data, Outsiders.get(data.nickname).attributes);
+				data.type = data.nickname === account.nickname ? 'me' : 'other';
+				
+				$('section.messages').append(render('comment', data));
 			});
 			
 			EventedParser.on('user:join', function(data){
+				console.log('user:join')
 				Outsiders.join({
 					nickname: data.nickname
 				,	avatar: data.avatar
@@ -444,7 +492,7 @@
 				
 			});
 			EventedParser.on('user:depart', function(data){
-				Outsiders.remove(data.nickname)
+				Outsiders.remove(data.nickname);
 			});
 			EventedParser.on('user:nickchange', function(){});
 			
@@ -495,8 +543,8 @@
 		window.Application = Application;
 		
 		// dummy data, aka OMFG chain madness
-		false && $(document.body)
-			.find('input[name="nickname"]').val('example').end()
+		true && $(document.body)
+			.find('input[name="nickname"]').val('example' +  Math.random()).end()
 			.find('input[name="email"]').val('info@3rd-Eden.com').end()
 			.find('.auth form').trigger('submit').end()
 	}
