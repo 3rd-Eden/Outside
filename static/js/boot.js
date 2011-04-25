@@ -89,8 +89,12 @@
        */
     , initialize: function(){
         this.bind('add', function(friend){
-          console.log(friend);
-          $('aside.users .joined').append(render('user', friend.attributes));
+          friend = _.clone(friend.attributes);
+          _.extend(friend, {
+            type: friend.nickname 
+          })
+          
+          $('aside.users .joined').append(render('user', friend));
         });
         
         this.bind('remove', function(friend){
@@ -504,7 +508,8 @@
         Outsiders.join({
           nickname: data.nickname
         ,  avatar: data.avatar
-        , rooms: data.rooms // we share the same rooms 
+        , rooms: data.rooms // we share the same rooms
+        , slug: data.slug
         });
         
       });
