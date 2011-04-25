@@ -144,6 +144,7 @@ io.on('connection', function( client ){
     
     // the account details are validating, so setup the actual account
     client.nickname = data.nickname;
+    client.slug = channel.slug(client.nickname);
     client.avatar = gravatar.url(data.email, {s:48, r:'pg', d: '404'});
     client.details.connected = new Date();
     

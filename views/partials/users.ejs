@@ -1,14 +1,25 @@
-  <aside class="users">
-   <div class="users-active table">
-    <div class="joined tr">
-      <div class="user"><a href="#/details/john"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
-      <div class="user"><a href="#/details/jane"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
-      <div class="user"><a href="#/details/jenny"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
-    </div>
-    <footer class="pm t-foot">
-      <div class="user"><a href="#/details/jack"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>199</span></div>
-      <div class="user details"><a href="#/details/mira"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>45</span></div>
-      <div class="user"><a href="#/details/nickname"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>1</span></div>
-    </footer>
-   </div>
-  </aside>
+<aside class="users">
+ <div class="users-active table">
+  <div class="joined tr">
+    <div class="user"><a href="#/details/john"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
+    <div class="user"><a href="#/details/jane"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
+    <div class="user"><a href="#/details/jenny"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a></div>
+  </div>
+  <footer class="pm t-foot">
+    <div class="user"><a href="#/details/jack"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>199</span></div>
+    <div class="user details"><a href="#/details/mira"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>45</span></div>
+    <div class="user"><a href="#/details/nickname"><img src="/i/anonymous.png" alt="Anonymous" /></a><a href="#/message/nickname" class="message">nickname</a><span>1</span></div>
+  </footer>
+ </div>
+</aside>
+<script type="text/template">
+<div class="user">
+  <a href="#/details/<%= alias %>">
+    <img src="<%= avatar %>" alt="<%= nickname %>" />
+  </a>
+  <a href="#/message/<%= alias %>" class="message"><%= nickname %></a>
+  <% if(type == 'pm'){ %>
+  <span><%= unread %></span>
+  <% } %>
+</div>
+</script>
