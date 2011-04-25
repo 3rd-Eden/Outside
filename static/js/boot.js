@@ -89,16 +89,23 @@
        */
     , initialize: function(){
         this.bind('add', function(friend){
+          // We need to find our self, so we can determin the `type` of this
+          // add. If the rooms are not the same as mine or if the user is already
+          // in the channel, the type is a personal message.
+          var me = this.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
+            , roommate = me && me.account ? _.some(friend.attributes.rooms, function(room){
+                return _.some(me.attributes.rooms, function(mine){ return mine === room });
+              }) : false;
+          
           friend = _.clone(friend.attributes);
-          _.extend(friend, {
-            type: friend.nickname 
-          })
+          friend.type = me && roommate || !me ? 'user' : 'pm';
           
           $('aside.users .joined').append(render('user', friend));
         });
         
         this.bind('remove', function(friend){
-        
+          // because we have an id attached to the element, it will make removing easy
+          $('#user_' + friend.attributes.slug).remove();
         })
       }
     ,  url: '/users/'

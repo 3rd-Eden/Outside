@@ -154,7 +154,7 @@ io.on('connection', function( client ){
     client.filter({ type:'account:created', roommates: channel.roommates(client), validates: true, avatar: client.avatar, slug:client.slug });
     
     // announce that a new user has joined
-    io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details }, client));
+    io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details, slug:client.slug }, client));
   });
   
   // handle messages from the clients
