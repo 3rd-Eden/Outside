@@ -1,22 +1,23 @@
 {
-  "name": "outside",
-  "description": "Go Outside to chat",
-  "version": "0.0.0",
-  "author": "Arnout Kazemier (http://3rd-Eden.com)",
-  "directories": {
+  "name": "outside"
+, "description": "Go Outside to chat"
+, "version": "0.0.0"
+, "author": "Arnout Kazemier (http://3rd-Eden.com)"
+, "directories": {
     "public": "./static"
-  },
-  "engines": {
+  }
+, "engines": {
     "node": ">= 0.4.3"
-  },
-  "dependencies": {
-    "connect-auth": "0.2.2",
-    "ejs": "0.3.1",
-    "express": "2.0.0rc",
-    "express-namespace": "0.0.3",
-    "gravatar": "1.0.2",
-    "oauth": "0.9.0",
-    "socket.io": "0.6.16",
-    "cluster": "0.5.5"
+  }
+, "dependencies": {
+    "connect-auth": "0.2.2"
+  , "ejs": "0.3.1"
+  , "express": "2.0.0rc"
+  , "express-namespace": "0.0.3"
+  , "gravatar": "1.0.2"
+  , "oauth": "0.9.0"
+  , "socket.io": "0.6.16"
+  , "cluster": "0.5.5"
+  , "validator": "0.1.9"
   }
 }
