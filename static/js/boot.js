@@ -483,7 +483,6 @@
 			});
 			
 			EventedParser.on('user:join', function(data){
-				console.log('user:join')
 				Outsiders.join({
 					nickname: data.nickname
 				,	avatar: data.avatar

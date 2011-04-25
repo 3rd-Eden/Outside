@@ -18,14 +18,14 @@
    </ul>
   </nav>
 </header>
-<%- partial('inc/auth.ejs') %>
+<%- partial('partials/auth.ejs') %>
 <!-- the app -->
 <div class="app hidden">
   <section class="box">
-<%- partial('inc/messageBox.ejs') %>
+  <%- partial('partials/messages.ejs') %>
   </section>
-<%- partial('inc/usersList.ejs') %>
-<%- partial('inc/userDetails.ejs') %>
+<%- partial('partials/users.ejs') %>
+<%- partial('partials/details.ejs') %>
 </div>
 <!-- / -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
