@@ -81,6 +81,22 @@
             return '/user/' + this.get('nickname');
           }
       })
+      
+      /**
+       * When we are created, we are going to attach event listeners
+       * so we can update the users panel when new users join, or leave
+       * the chat box. This allows us to automate the process
+       */
+    , initialize: function(){
+        this.bind('add', function(friend){
+          console.log(friend);
+          $('aside.users .joined').append(render('user', friend.attributes));
+        });
+        
+        this.bind('remove', function(friend){
+        
+        })
+      }
     ,  url: '/users/'
     , join: function(details){
         // create a id attribute if it doesn't exist so we can
@@ -301,6 +317,7 @@
                   // Register a new acount
                   self.me = Outsiders.join({
                     nickname: data.nickname
+                  , slug: data.slug
                   , avatar: data.avatar
                   , rooms: data.rooms
                   , me: true // \o/ yup, it's me
@@ -315,7 +332,8 @@
                     while(i--){
                       Outsiders.join({
                         nickname: data.roommates[i].nickname
-                      ,  avatar: data.roommates[i].avatar
+                      , slug: data.roommates[i].slug
+                      , avatar: data.roommates[i].avatar
                       , rooms: data.rooms // we share the same rooms 
                       })
                     }
