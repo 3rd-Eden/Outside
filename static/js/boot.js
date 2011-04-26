@@ -164,13 +164,14 @@
      */
     proxy: {
       // validation and registration
-      'check:nickname':     'check:nickname',
+      'check:nickname':   'check:nickname',
       'check:email':      'check:email',
       'account:created':  'account:created',
       
       // messages
       'comment':          'comment',
       'user:join':        'user:join',
+      'user:depart':      'user:depart',
       
       
       // messages
@@ -185,7 +186,6 @@
       'message' :     'channel:message',
       'announcement': 'channel:announcement',
       'nick:change':   'channel:nickname',
-      'user:depart':  'channel:depart',
       
       // status sync
       'update':       'status:update'
@@ -549,7 +549,7 @@
     service: function(type){
       this.state = 'auth:service';
       
-      alert('zomg, service fails, login using a normal acount, kay?');
+      alert('zomg, service based logins still fails, login using a normal account, kay?');
       // ignore the awful chaining, this is just a filty hack
       if (!type) 
         $('.auth form').find('.regular').hide().end().find('.services').show();
@@ -572,7 +572,7 @@
     window.Application = Application;
     
     // dummy data, aka OMFG chain madness
-    true && $(document.body)
+    document.domain === "localhost" && $(document.body)
       .find('input[name="nickname"]').val('example' +  Math.random()).end()
       .find('input[name="email"]').val('info@3rd-Eden.com').end()
       .find('.auth form').trigger('submit').end()
