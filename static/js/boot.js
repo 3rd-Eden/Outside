@@ -498,7 +498,17 @@
         // handle private messages
       });
       EventedParser.on('announcement', function(){
-        // handle announcements
+        // clear all current messages
+        $('section.messages article').remove();
+        
+        var me = Outsiders.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
+          // @TODO filter out PM messages as they don't need to be deleted
+          , them = Outsiders.select(function(friend){ return friend !== me });
+          
+        _.forEach(them, function(friend){
+          Outside.remove(friend.attributes.nickname);
+        });
+
       });
       EventedParser.on('heartbeat', function(){
         // handle heartbeats from the server
