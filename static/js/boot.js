@@ -328,9 +328,6 @@
         						colour: 'rgba(184, 217, 108, 1)',
         						height: 55,
         						width: 55
-        					},
-        					function(){
-        						console.log('done');
         					});
                   
                   // update the view
@@ -580,9 +577,7 @@
        * Also known as a batch join, multiple users are added at once
        * to our Outsiders group.
        */
-       console.log('I has been waiting')
       EventedParser.on('user:roommates', function(data){
-        console.log('I receive')
         if (data.roommates && data.roommates.length){
           var i = data.roommates.length;
           while(i--){
