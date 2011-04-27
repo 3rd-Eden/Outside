@@ -512,12 +512,19 @@
         });
         
         // Flag annoucements
+        update = true;
 
       });
-      EventedParser.on('heartbeat', function(){
+      EventedParser.on('heartbeat', function(data){
         // handle heartbeats from the server
         if(update){
-        
+          update = false;
+          $('#thefinalcountdown').pietimer({
+						seconds: data.timeleft / 1000,
+						colour: 'rgba(184, 217, 108, 1)',
+						height: 55,
+						width: 55
+					});
         }
       });
       EventedParser.on('comment', function(data){
