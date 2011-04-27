@@ -499,7 +499,7 @@
        * Handle `announcements` from the server. These annoucements will let us known that next update
        * will probably clear
        */
-      EventedParser.on('announcement', function(){
+      EventedParser.on('announcement', function(data){
         // clear all current messages
         $('section.messages article').remove();
         
@@ -513,6 +513,14 @@
         
         // Flag annoucements
         update = true;
+        
+        // display the actual message from the server
+        var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form div.table');
+        setTimeout(function(){
+          announcement.fadeOut('slow', function(){
+            announcement.remove();
+          })
+        }, 3000);
 
       });
       EventedParser.on('heartbeat', function(data){
