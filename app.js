@@ -2,9 +2,9 @@
  * Capture uncaughtExceptions at the top to capture the whole initation
  * process.
  */
-process.addListener( "uncaughtException", function captureException( err ){
-  console.log( err.stack.split( "\n" ) );
-  console.dir( err );
+process.addListener( "uncaughtException", function captureException(err){
+  console.log(err.stack.split("\n"));
+  console.dir(err );
 });
 
 /**
@@ -30,22 +30,24 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   // Set up our default templating and template processor
   // we need to register a .html handler or we need to parse a .ejs file
-  app.set( "view engine", "ejs" );
-  app.set( "views", __dirname + '/views' );
-  app.use( express.favicon() );
-  app.use( express.cookieParser() );
-  app.use( auth([
+  app.set("view engine", "ejs");
+  app.set("views", __dirname + '/views');
+  app.use(express.favicon());
+  app.use(express.cookieParser());
+  app.use(auth([
     auth.Twitter({consumerKey: api.TWITTER_CONSUMER, consumerSecret: api.TWITTER_SECRET})
-  , auth.Facebook({appId : api.FACEBOOK, appSecret: api.FACEBOOK_SECRET, scope: "email", callback: 'someurl'})
-  ]) )
-  app.use( express.static( __dirname + '/static' ) );
+  , auth.Facebook({appId: api.FACEBOOK, appSecret: api.FACEBOOK_SECRET, scope: "email", callback: 'someurl'})
+  ]))
+  app.use(express.static( __dirname + '/static'));
 });
  
 /**
  * Setup the routers.
  */
 app.get("/", function(req, res){
-  res.render("index", {stats:channel.count});
+  res.render("index", {
+    stats:channel.count
+  });
 });
 
 app.get("/*", function(req, res){

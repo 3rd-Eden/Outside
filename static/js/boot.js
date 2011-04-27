@@ -170,25 +170,10 @@
       
       // messages
       'comment':          'comment',
+      'announcement':     'announcement',
       'user:join':        'user:join',
       'user:depart':      'user:depart',
-      
-      
-      // messages
-      'notice':        'notice',
-      'error':        'error',
-      
-      // user events
-      'private' :     'user:private',
-      'unicorn':      'user:disconnect',
-      
-      // channel events
-      'message' :     'channel:message',
-      'announcement': 'channel:announcement',
-      'nick:change':   'channel:nickname',
-      
-      // status sync
-      'update':       'status:update'
+      'heartbeat':        'heartbeat'
     },
     
     API: {
@@ -335,6 +320,17 @@
                   });
                   
                   self.me.account = data;
+                  
+                  // Add the canvas timer:
+                  $('#thefinalcountdown').pietimer({
+        						seconds: data.timeleft / 1000,
+        						colour: 'rgba(184, 217, 108, 1)',
+        						height: 55,
+        						width: 55
+        					},
+        					function(){
+        						console.log('done');
+        					});
                   
                   // Check if there are already some users in the channel, if this is the
                   // case, lets add them :)
@@ -489,7 +485,8 @@
       var self = this
         , me = self.me
         , account = me.account
-        , box = $('.box');
+        , box = $('.box')
+        , update = false;
       
       this.state = 'loggedin';
       
@@ -497,6 +494,11 @@
       EventedParser.on('private', function(){
         // handle private messages
       });
+      
+      /**
+       * Handle `announcements` from the server. These annoucements will let us known that next update
+       * will probably clear
+       */
       EventedParser.on('announcement', function(){
         // clear all current messages
         $('section.messages article').remove();
@@ -506,12 +508,17 @@
           , them = Outsiders.select(function(friend){ return friend !== me });
           
         _.forEach(them, function(friend){
-          Outside.remove(friend.attributes.nickname);
+          Outsiders.remove(Outsiders.get(friend.attributes.nickname));
         });
+        
+        // Flag annoucements
 
       });
       EventedParser.on('heartbeat', function(){
         // handle heartbeats from the server
+        if(update){
+        
+        }
       });
       EventedParser.on('comment', function(data){
         // add more details
