@@ -173,6 +173,7 @@
       'announcement':     'announcement',
       'user:join':        'user:join',
       'user:depart':      'user:depart',
+      'user:roommates':   'user:roommates',
       'heartbeat':        'heartbeat'
     },
     
@@ -270,8 +271,8 @@
      * Setup the routes -> locations
      */
     routes: {
-      '/':                       'loaded',
-      '/signup/service/:type':   'service',
+      '/':                      'loaded',
+      '/signup/service/:type':  'service',
       '/hello/:nickname':       'setup'
     },
     
@@ -332,22 +333,17 @@
         						console.log('done');
         					});
                   
-                  // Check if there are already some users in the channel, if this is the
-                  // case, lets add them :)
-                  if (data.roommates && data.roommates.length){
-                    var i = data.roommates.length;
-                    while(i--){
-                      Outsiders.join({
-                        nickname: data.roommates[i].nickname
-                      , slug: data.roommates[i].slug
-                      , avatar: data.roommates[i].avatar
-                      , rooms: data.rooms // we share the same rooms 
-                      })
-                    }
-                  }
-                  
                   // update the view
                   window.location.hash = '/hello/' + data.nickname;
+                  
+                  // Check if there are already some users in the channel, if this is the
+                  // case, lets add them :) this needs to be done after we have updated
+                  // the location, so a listener has been added in our `setup` method.
+                  // setTimout is used to make sure, that the other function is done with
+                  // executing
+                  if (data.roommates && data.roommates.length){
+                    setTimeout(function(){EventedParser.emit('user:roommates', data)},0);
+                  }
                 } else {
                   alert(data ? data.message : 'Unable to validate the nickname');
                 }
@@ -499,30 +495,42 @@
        * Handle `announcements` from the server. These annoucements will let us known that next update
        * will probably clear
        */
+      /**
+       * When we receive an annoucement from the server, we might need to clear the channel
+       */
       EventedParser.on('announcement', function(data){
         // clear all current messages
-        $('section.messages article').remove();
-        
-        var me = Outsiders.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
-          // @TODO filter out PM messages as they don't need to be deleted
-          , them = Outsiders.select(function(friend){ return friend !== me });
+        if (data.update){
+          $('section.messages article').remove();
           
-        _.forEach(them, function(friend){
-          Outsiders.remove(Outsiders.get(friend.attributes.nickname));
-        });
-        
-        // Flag annoucements
-        update = true;
+          var me = Outsiders.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
+            // @TODO filter out PM messages as they don't need to be deleted
+            , them = Outsiders.select(function(friend){ return friend !== me });
+            
+          _.forEach(them, function(friend){
+            Outsiders.remove(Outsiders.get(friend.attributes.nickname));
+          });
+          
+          // Flag annoucements
+          update = true;
+        }
         
         // display the actual message from the server
-        var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form div.table');
-        setTimeout(function(){
-          announcement.fadeOut('slow', function(){
-            announcement.remove();
-          })
-        }, 3000);
+        if (data.message){
+          var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form div.table');
+          setTimeout(function(){
+            announcement.fadeOut('slow', function(){
+              announcement.remove();
+            })
+          }, 3000);
+        }
 
       });
+      
+      /**
+       * Respond on heartbeats from the application server, this allows us to sync our details
+       * between the server and client.
+       */
       EventedParser.on('heartbeat', function(data){
         // handle heartbeats from the server
         if(update){
@@ -535,6 +543,11 @@
 					});
         }
       });
+      
+      /**
+       * A new comment has been made by a user, we need to add it to the chat view
+       * so it actually get's rendered propperly. 
+       */
       EventedParser.on('comment', function(data){
         // add more details
         _.extend(data, Outsiders.get(data.nickname).attributes);
@@ -543,6 +556,9 @@
         $(render('comment', data)).insertBefore('section.messages ol.dots');
       });
       
+      /**
+       * A new user has joined the room, add them to the outsiders
+       */
       EventedParser.on('user:join', function(data){
         Outsiders.join({
           nickname: data.nickname
@@ -550,11 +566,36 @@
         , rooms: data.rooms // we share the same rooms
         , slug: data.slug
         });
-        
       });
+      
+      /**
+       * When the user leave the channel, we need to remove them
+       * from our Outsiders list as well.
+       */
       EventedParser.on('user:depart', function(data){
         Outsiders.remove(data.nickname);
       });
+      
+      /**
+       * Also known as a batch join, multiple users are added at once
+       * to our Outsiders group.
+       */
+       console.log('I has been waiting')
+      EventedParser.on('user:roommates', function(data){
+        console.log('I receive')
+        if (data.roommates && data.roommates.length){
+          var i = data.roommates.length;
+          while(i--){
+            Outsiders.join({
+              nickname: data.roommates[i].nickname
+            , slug: data.roommates[i].slug
+            , avatar: data.roommates[i].avatar
+            , rooms: data.rooms // we share the same rooms 
+            })
+          }
+        }
+      });
+      
       EventedParser.on('user:nickchange', function(){});
       
       // prepare the application interface
