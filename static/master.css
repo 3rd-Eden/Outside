@@ -203,6 +203,15 @@ aside.details { background: #fff; width:285px; min-width:285px; border-left:3px 
 		
 		.box form .msg-input { padding: 12px; }
 		.box form .msg-send { width: 100px; display: table-cell; overflow: hidden; }
+		/* annoucment banner */
+		.box .announcement {
+		  background: #60AC40; border-top:1px solid #79c352; border-bottom:1px solid #488a2e; color:#fff; overflow:hidden;
+		  background: -moz-linear-gradient(top, #60AC40 0%, #519635 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#60AC40), color-stop(100%,#519635));
+		}
+		  .box .announcement h6 { font-weight: bold; font-size:14px; float:left; text-shadow:0px 1px 0px #4f9034; padding:15px; border-right: 1px solid #519a36 }
+		    .box .announcement p { float:left; line-height: 16px; padding:15px; border-left:1px solid #63ab41 }
+		    .box .announcement a { float: right; width:20px; height: 20px }
+		
 
 /**
  * messages

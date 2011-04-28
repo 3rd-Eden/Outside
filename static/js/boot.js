@@ -528,7 +528,7 @@
         
         // display the actual message from the server
         if (data.message){
-          var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form div.table');
+          var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form');
           setTimeout(function(){
             announcement.fadeOut('slow', function(){
               announcement.remove();
@@ -641,5 +641,6 @@
       .find('input[name="nickname"]').val('example' +  Math.random()).end()
       .find('input[name="email"]').val('info@3rd-Eden.com').end()
       .find('.auth form').trigger('submit').end()
+      .find('div.boxed-btm form').prepend(render('announcement', {message:'debug'})).end()
   }
 }(location.port === '8908'));
