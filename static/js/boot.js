@@ -504,14 +504,18 @@
               // @TODO filter out PM messages as they don't need to be deleted
             , them = Outsiders.select(function(friend){ return friend !== me });
           
-          console.log(me, them);
-          
+          // remove all `friends` so we can make some new friends
           _.forEach(them, function(friend){
             Outsiders.remove(Outsiders.get(friend.attributes.nickname));
           });
           
-          // update our rooms
-          //me.set('rooms', (me.account.rooms = data.rooms));
+          // update our rooms, as this is used to check against pms
+          // and omg i saved a function call by not doing me.set(); 
+          me.attributes.room = me.account.rooms = data.rooms;
+          
+          if (data.roommates && data.roommates.length){
+            setTimeout(function(){EventedParser.emit('user:roommates', data)},0);
+          }
           
           // update the timer
           $('#thefinalcountdown').pietimer({
