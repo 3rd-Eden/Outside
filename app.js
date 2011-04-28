@@ -62,6 +62,7 @@ io.on('connection', function( client ){
   /**
    * Attach the default properties on the connected cliend
    * @type {Object}
+   * @api private
    */
   client.details = {
     words: 0
@@ -69,6 +70,13 @@ io.on('connection', function( client ){
   , resync: 0
   , session: new Date()
   };
+  
+  /**
+   * Attach a reference to the io
+   * @type {Object}
+   * @api private
+   */
+  client.io = io;
   
   /**
    * Simple message filtering.

@@ -99,6 +99,7 @@
           
           friend = _.clone(friend.attributes);
           friend.type = me && roommate || !me ? 'user' : 'pm';
+          friend.unread = friend.unread || undefined;
           
           $('aside.users .joined').append(render('user', friend));
         });
@@ -416,7 +417,7 @@
             if (nickname.val().length < 3) parent.addClass('invalid') && label.find('span').remove().end().append('<span class="invalid">Your nickname is required</span>');
           })
          .live('focus', function(){
-             EventedParser.on('check:nickname', nickvalidate);
+            EventedParser.on('check:nickname', nickvalidate);
             nickname.parent().addClass('focus');
           })
          .live('keyup', function(){
@@ -478,8 +479,7 @@
       var self = this
         , me = self.me
         , account = me.account
-        , box = $('.box')
-        , update = false;
+        , box = $('.box');
       
       this.state = 'loggedin';
       
@@ -497,19 +497,29 @@
        */
       EventedParser.on('announcement', function(data){
         // clear all current messages
-        if (data.update){
+        if (data.reset){
           $('section.messages article').remove();
           
           var me = Outsiders.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
-            // @TODO filter out PM messages as they don't need to be deleted
+              // @TODO filter out PM messages as they don't need to be deleted
             , them = Outsiders.select(function(friend){ return friend !== me });
-            
+          
+          console.log(me, them);
+          
           _.forEach(them, function(friend){
             Outsiders.remove(Outsiders.get(friend.attributes.nickname));
           });
           
-          // Flag annoucements
-          update = true;
+          // update our rooms
+          //me.set('rooms', (me.account.rooms = data.rooms));
+          
+          // update the timer
+          $('#thefinalcountdown').pietimer({
+						seconds: data.timeleft / 1000,
+						colour: 'rgba(184, 217, 108, 1)',
+						height: 55,
+						width: 55
+					});
         }
         
         // display the actual message from the server
@@ -523,24 +533,7 @@
         }
 
       });
-      
-      /**
-       * Respond on heartbeats from the application server, this allows us to sync our details
-       * between the server and client.
-       */
-      EventedParser.on('heartbeat', function(data){
-        // handle heartbeats from the server
-        if(update){
-          update = false;
-          $('#thefinalcountdown').pietimer({
-						seconds: data.timeleft / 1000,
-						colour: 'rgba(184, 217, 108, 1)',
-						height: 55,
-						width: 55
-					});
-        }
-      });
-      
+            
       /**
        * A new comment has been made by a user, we need to add it to the chat view
        * so it actually get's rendered propperly. 
