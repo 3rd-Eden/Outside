@@ -309,7 +309,7 @@
           // if we are idle, we are now active
           if (Status.idle) active();
           
-          idleTimer = setTimeout(idle, 3000);
+          idleTimer = setTimeout(idle, 30000);
         }
         , idleTimer;
       
