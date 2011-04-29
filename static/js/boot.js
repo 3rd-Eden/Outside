@@ -8,7 +8,6 @@
   /**
    * Add Node.js Event Emitter API compatiblity, just because we are cool like that
    */
-  Backbone.Events.emit = Backbone.Events.trigger;
   Backbone.Events.on = Backbone.Events.bind;
   Backbone.Events.removeListener = Backbone.Events.unbind;
   Backbone.Events.once = function(event, func){
@@ -260,6 +259,53 @@
     }
   };
   _.extend(EventedParser, Backbone.Events);
+  
+  /**
+   * Status, our status updater ( who would have guessed that :D )
+   */
+  var Status = {
+    idle: false,
+    initialize: function(){
+      
+      
+      // We want to be able to detect when a user goes in `idle` state so we can make
+      // updates more visable for the user. For example by updating the `favicon.ico`
+      // and document title or even flash the button in IE
+      var idle = function(){ if(!Status.idle) Status.emit('idle'); Status.idle = true }
+        , active = function(){ if (Status.idle) Status.emit('active'); Status.idle = false }
+        , timeout = function(){
+          clearTimeout(idleTimer);
+          
+          // if we are idle, we are now active
+          if (Status.idle) active();
+          
+          idleTimer = setTimeout(idle,30000);
+        }
+        , idleTimer;
+      
+      // attach the DOM events
+      $(window)
+        .focus(active)
+        .blur(idle)
+        .mousemove(timeout)
+        .keydown(timeout)
+        .bind('touchstart', timeout);
+    },
+    /**
+     * @param {Object} data The message that needs to be displayed
+     */
+    announce: function(data){
+      var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form');
+      
+      // remove the annoucement again after x amount of milliseconds 
+      setTimeout(function(){
+        announcement.fadeOut('slow', function(){
+          announcement.remove();
+        })
+      }, data.timeout || 3000);    
+    }
+  };
+  _.extend(Status, Backbone.Events);  
   
   /**
    * Outside, Backbone Controller
@@ -527,14 +573,8 @@
         }
         
         // display the actual message from the server
-        if (data.message){
-          var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form');
-          setTimeout(function(){
-            announcement.fadeOut('slow', function(){
-              announcement.remove();
-            })
-          }, 3000);
-        }
+        if (data.message)
+          Status.announce(data);
 
       });
             
@@ -623,17 +663,20 @@
   
   // reset hash state
   window.location.hash = '#/';
+  
   /**
    * Initiate `Outside` application
    */
   var Application = new Outside()
     , Outsiders = new PotentialFriends();
-    
+  
+  Status.initialize();
   Backbone.history.start();
   
   // only expose an external API when we are in development mode
   if (development){
     Application.Outsiders = Outsiders;
+    Application.Status = Status;
     window.Application = Application;
     
     // dummy data, aka OMFG chain madness
