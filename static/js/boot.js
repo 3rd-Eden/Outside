@@ -9,6 +9,7 @@
    * Add Node.js Event Emitter API compatiblity, just because we are cool like that
    */
   Backbone.Events.on = Backbone.Events.bind;
+  Backbone.Events.emit = Backbone.Events.trigger;
   Backbone.Events.removeListener = Backbone.Events.unbind;
   Backbone.Events.once = function(event, func){
     var self = this
@@ -308,7 +309,7 @@
           // if we are idle, we are now active
           if (Status.idle) active();
           
-          idleTimer = setTimeout(idle,30000);
+          idleTimer = setTimeout(idle, 3000);
         }
         , idleTimer;
       
@@ -341,7 +342,7 @@
      *
      * @api public
      */
-    destroy: function(){}
+    destroy: function(){},
     
     /**
      * Add an annoucment banner the to chat view. This is one of the most `visible` status
@@ -351,15 +352,19 @@
      * @api public
      */
     announce: function(data){
-      var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form');
+      var announcement = $(render('announcement', data))
+			.prependTo('div.boxed-btm form')
+			.css({right:1000}) // hide it
+			.animate({right:0}, {
+			  duration: 300
+			, complete: function(){
+			    announcement.addClass('announced')
+			  }
+			});
       
       // remove the annoucement again after x amount of milliseconds 
-      setTimeout(function(){
-        announcement.fadeOut('slow', function(){
-          announcement.remove();
-        })
-      }, data.timeout || 3000);    
-    }
+      setTimeout(announcement.remove, data.timeout || 5000);    
+    },
     
     update: function(idleOnly){
     
@@ -746,6 +751,5 @@
       .find('input[name="nickname"]').val('example' +  Math.random()).end()
       .find('input[name="email"]').val('info@3rd-Eden.com').end()
       .find('.auth form').trigger('submit').end()
-      .find('div.boxed-btm form').prepend(render('announcement', {message:'debug'})).end()
   }
 }(location.port === '8908'));
