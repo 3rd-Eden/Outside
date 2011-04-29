@@ -12,13 +12,14 @@
   Backbone.Events.removeListener = Backbone.Events.unbind;
   Backbone.Events.once = function(event, func){
     var self = this
-    
       /**
-       * Removeable shizzle
+       * Removeable shizzle, this is the actual function that gets called
+       * and removes it self again from the `Backbone.Events` so it's only
+       * called once. This method is the secret sause of a once listener!
        */
       , removeable = function(){
-        func.apply(this, arguments);
-        self.removeListener(event, removeable);
+          func.apply(this, arguments);
+          self.removeListener(event, removeable);
       };
       
     this.on(event, removeable);
@@ -35,6 +36,14 @@
    
   /**
    * Thanks John; http://ejohn.org/blog/javascript-micro-templating
+   * Slightly modified the code to use different template tags as they
+   * are clashing with the `ejs` template engine of Node.js. `<% .. %>` 
+   * is now `[% .. %]`. Small change, but important!
+   *
+   * @param {String} str The id attribute of the <script type="text/template> element
+   * @param {Object} data The data for the template
+   * @return {String} The generated template
+   * @api public
    */
   var render = (function(){
     var cache = {}
@@ -261,17 +270,37 @@
   _.extend(EventedParser, Backbone.Events);
   
   /**
-   * Status, our status updater ( who would have guessed that :D )
+   * Status allows us to update the Application with different statuses
+   * because I didn't want to clutter the Application code with it, I
+   * moved it to it's own `Class`.
+   *
+   * Status contains methods and functionality to notify the user of 
+   * `status` updates.
    */
   var Status = {
+    /**
+     * Is the connected user idling?
+     *
+     * @type {Boolean}
+     * @api public
+     */
     idle: false,
+    
+    /**
+     * We need to load in some potentially `heavy` JavaScript code. We need to know when
+     * a user is `idle` or no longer actively engaging with the page, we can than notify
+     * them of updates that are more visible when you are not staring at the page. Like
+     * updating the 
+     *
+     * @api public
+     */
     initialize: function(){
       
       
       // We want to be able to detect when a user goes in `idle` state so we can make
       // updates more visable for the user. For example by updating the `favicon.ico`
       // and document title or even flash the button in IE
-      var idle = function(){ if(!Status.idle) Status.emit('idle'); Status.idle = true }
+      var idle = function(){ if (!Status.idle) Status.emit('idle'); Status.idle = true }
         , active = function(){ if (Status.idle) Status.emit('active'); Status.idle = false }
         , timeout = function(){
           clearTimeout(idleTimer);
@@ -283,16 +312,43 @@
         }
         , idleTimer;
       
-      // attach the DOM events
+      // Attach the DOM events
       $(window)
         .focus(active)
         .blur(idle)
         .mousemove(timeout)
         .keydown(timeout)
         .bind('touchstart', timeout);
+        
+      // Add a secret destruction method
+      Status.destroy = function(){
+        // make sure we our last state was `active`
+        if (Status.idle) active();
+        Status.idle = false;
+        
+        // clear the timer, and remove all events
+        clearTimeout(idleTimer);        
+        $(window).unbind();
+        
+        // add a new dummy again
+        Status.destroy = function(){}
+      }
     },
+    
     /**
+     * This will be replaced once the `initialize` method is called with a function
+     * that clears the actions we done on initialization.
+     *
+     * @api public
+     */
+    destroy: function(){}
+    
+    /**
+     * Add an annoucment banner the to chat view. This is one of the most `visible` status
+     * updates possible.
+     *
      * @param {Object} data The message that needs to be displayed
+     * @api public
      */
     announce: function(data){
       var announcement = $(render('announcement', data)).prependTo('div.boxed-btm form');
@@ -303,6 +359,10 @@
           announcement.remove();
         })
       }, data.timeout || 3000);    
+    }
+    
+    update: function(idleOnly){
+    
     }
   };
   _.extend(Status, Backbone.Events);  
@@ -376,6 +436,9 @@
         						height: 55,
         						width: 55
         					});
+                  
+                  // Initialize status so we start polling for idle activity
+                  Status.initialize();
                   
                   // update the view
                   window.location.hash = '/hello/' + data.nickname;
@@ -670,7 +733,6 @@
   var Application = new Outside()
     , Outsiders = new PotentialFriends();
   
-  Status.initialize();
   Backbone.history.start();
   
   // only expose an external API when we are in development mode
