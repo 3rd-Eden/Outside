@@ -106,12 +106,13 @@
           // We need to find our self, so we can determin the `type` of this
           // add. If the rooms are not the same as mine or if the user is already
           // in the channel, the type is a personal message.
-          var me = this.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
-            , roommate = me && me.account ? _.some(friend.attributes.rooms, function(room){
+          var me = this.me()
+            , roommate = me ? _.some(friend.attributes.rooms, function(room){
                 return _.some(me.attributes.rooms, function(mine){ return mine === room });
               }) : false;
           
           friend = _.clone(friend.attributes);
+          friend.me = !me;
           friend.type = me && roommate || !me ? 'user' : 'pm';
           friend.unread = friend.unread || undefined;
           
@@ -167,7 +168,12 @@
        */
     , them: function(pm){
         var me = this.me()
-          , them = this.select(function(friend){ return friend !== me });
+          , them = this.select(function(friend){
+            return friend !== me && 
+              (!pm && me ? _.some(friend.attributes.rooms, function(room){
+                return _.some(me.attributes.rooms, function(mine){ return mine === room });
+              }) : true)
+          });
         
         return them;
       }
