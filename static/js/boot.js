@@ -644,10 +644,18 @@
         , box = $('.box');
       
       this.state = 'loggedin';
+      this.view = 'chat';
       
       // Add the listeners
-      EventedParser.on('private', function(){
-        // handle private messages
+      EventedParser.on('private', function(data){
+        // add more details
+        _.extend(data, Outsiders.get(data.nickname).attributes);
+        data.type = data.nickname === account.nickname ? 'me' : 'other';
+        
+        var slug = data.slug
+          , panel = self.findPanel(slug) || self.addPanel(slug);
+        
+        $(render('comment', data)).appendTo(panel);
       });
       
       /**
@@ -773,7 +781,23 @@
       // ignore the awful chaining, this is just a filty hack
       if (!type) 
         $('.auth form').find('.regular').hide().end().find('.services').show();
-    }
+    },
+    
+    /**
+     * Adds a new panel to the chatbox view
+     *
+     * @param {String} id The id of the panel
+     * @api public
+     */
+    addPanel: function(id){ return $('<div class="view '+ id +'"></div>').insertBefore('section.messages ol.dots') },
+    
+    /**
+     * Finds the panel inside the chatbox
+     *
+     * @param {String} id The id of the panel
+     * @api public
+     */
+    findPanel: function(id){ return $('section.box .view.' + id) }
   });
   
   // reset hash state
