@@ -363,7 +363,7 @@
 			});
       
       // remove the annoucement again after x amount of milliseconds 
-      setTimeout(announcement.remove, data.timeout || 5000);    
+      setTimeout(function(){announcement.remove()}, data.timeout || 5000);    
     },
     
     update: function(idleOnly){
@@ -655,7 +655,7 @@
         _.extend(data, Outsiders.get(data.nickname).attributes);
         data.type = data.nickname === account.nickname ? 'me' : 'other';
         
-        $(render('comment', data)).insertBefore('section.messages ol.dots');
+        $(render('comment', data)).appendTo('section.messages div.chat');
       });
       
       /**
