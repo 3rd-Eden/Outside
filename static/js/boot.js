@@ -128,11 +128,14 @@
        * @type {String}
        */
     , url: '/users/'
-     
-       /**
-        *
-        *
-        */
+    
+      /**
+       * Generates a new model and adds it to the collection.
+       *
+       * @param {Object} details The details / attributes for the model
+       * @returns {Backbone.Model} The model that was just added to the collection
+       * @api public
+       */
     , join: function(details){
         // create a id attribute if it doesn't exist so we can
         // find them this user back
@@ -143,7 +146,31 @@
         
         return friend;
       }
-  
+      
+      /**
+       * Searches the collection for the Model of our current user. This
+       * user has a `me` boolean and extra `account` details.
+       *
+       * @returns {Backbone.Model} The model that is the current user
+       * @api public
+       */
+    , me: function(){
+        return this.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
+      }
+      
+      /**
+       * Search for all Models in the collection that is not `me`
+       *
+       * @param {Boolean} pm Also return models that belong to a PM
+       * @returns {Array} A array with `Backbone.Model`s
+       * @api public
+       */
+    , them: function(pm){
+        var me = this.me()
+          , them = this.select(function(friend){ return friend !== me });
+        
+        return them;
+      }
   });
   
   /**
@@ -629,13 +656,12 @@
         if (data.reset){
           $('section.messages article').remove();
           
-          var me = Outsiders.select(function(friend){ return !!friend.attributes.me && !!friend.account})[0]
-              // @TODO filter out PM messages as they don't need to be deleted
-            , them = Outsiders.select(function(friend){ return friend !== me });
+          var me = Outsiders.me()
+            , them = Outsiders.them();
           
           // remove all `friends` so we can make some new friends
           _.forEach(them, function(friend){
-            Outsiders.remove(Outsiders.get(friend.attributes.nickname));
+            Outsiders.remove(friend);
           });
           
           // update our rooms, as this is used to check against pms
