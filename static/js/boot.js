@@ -671,8 +671,8 @@
           });
           
           // update our rooms, as this is used to check against pms
-          // and omg i saved a function call by not doing me.set(); 
-          me.attributes.room = me.account.rooms = data.rooms;
+          // and omg i saved a function call by not doing me.set();
+          me.attributes.rooms = me.account.rooms = data.rooms;
           
           if (data.roommates && data.roommates.length){
             setTimeout(function(){EventedParser.emit('user:roommates', data)},0);
