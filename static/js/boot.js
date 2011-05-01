@@ -177,6 +177,19 @@
         
         return them;
       }
+      
+      /**
+       * Find Models using the `attributes.slug` attribute.
+       *
+       * @param {String} slug The slug where we need to find a user on.
+       * @param {Boolean} all Return all matches, defaults to first result
+       * @returns {Array|Backbone.Model}
+       * @api public
+       */
+    , getBySlug: function(slug, all){
+        var results = this.select(function(friend){ return friend.attributes.slug == slug });
+        return all && results.length > 1 ? results : results[0]
+      }
   });
   
   /**
@@ -225,6 +238,7 @@
       'check:nickname':   'check:nickname'
     , 'check:email':      'check:email'
     , 'account:created':  'account:created'
+    , 'account:details':  'account:details'
       
       // messages
     , 'comment':          'comment'
@@ -257,7 +271,7 @@
        * @api public
        */
       private: function(slug, message){
-        var to = Outsiders.select(function(friend){ return friend.attributes.slug == slug })[0]
+        var to = Outsiders.getBySlug(slug)
           , request = {type:'private', to: to.attributes.nickname, message: message.toString(), nickname: this.nickname, time: new Date()};
           
         EventedParser.io.send(request);
@@ -316,6 +330,12 @@
         email = '' + email;
         
         EventedParser.io.send({type: 'account:create', nickname: nickname, email:email });
+      },
+      
+      details: function(slug){
+        var user = Outsiders.getBySlug(slug);
+        
+        EventedParser.io.send({type: 'account:details', nickname:user.attributes.nickname, from: this.nickname});
       }
     }
   };
@@ -403,6 +423,9 @@
      * @api public
      */
     announce: function(data){
+      // add a default title if none exists
+      data.title = data.title || 'Announcement';
+      
       var announcement = $(render('announcement', data))
       .prependTo('div.boxed-btm form')
       .css({right:1000}) // hide it
@@ -809,7 +832,7 @@
         
         var user = $(this)
           , nickname = user.html()
-          , slug = user.attr('data-slug')
+          , slug = user.parents('.user').attr('data-slug')
           , me = Outsiders.me()
           , panel = self.findPanel(slug);
         
@@ -818,6 +841,22 @@
         
         panel = panel.length ? panel : self.addPanel(slug);
         self.view = slug;
+      });
+      
+      joined.find('a.details').live("click", function(e){
+        e && e.preventDefault();
+        
+        var user = $(this)
+          , slug = user.parents('.user').attr('data-slug')
+          , me = Outsiders.me();
+          
+        EventedParser.once("account:details", function(data){
+          if (data.message) return Status.announce({message:data.message, title: 'Oh dear'});
+          
+          console.log("has details :D");
+        });
+        
+        EventedParser.API.details(slug);
       });
       
       // Now that all UI changes are made, we can make the application visable, this way we don't

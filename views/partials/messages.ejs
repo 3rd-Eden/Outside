@@ -30,9 +30,9 @@
   </article>
 </script>
 <script type="text/template" id="announcement">
-  <hgroup class="announcement">
+  <hgroup class="announcement[%= class ? class : '' %]">
   	<div>
-    	<h6>Announcement</h6>
+    	<h6>[%= title %]</h6>
     	<p>[%= message %]</p>
      	<a href="#/close/announcement">&nbsp;</a>
     </div>

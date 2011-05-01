@@ -174,6 +174,14 @@ io.on('connection', function( client ){
     io.publish(client,client.rooms,channel.filter({type:"user:join", nickname:client.nickname, avatar:client.avatar, details:client.details, slug:client.slug }, client));
   });
   
+  // handle details requests
+  client.on('account:details', function(data){
+    var target = channel.byNickname(data.nickname);
+    
+    if (!target) return client.filter({type: 'account:details', message: 'Couldn\'t find the user ' + data.nickname + '. You have just missed him!'});
+    return client.filter({type:'account:details', details: target.details, conversation: target.conversation});
+  });
+  
   // handle messages from the clients
   client.on('comment', function(data){
     var clean = channel.filter(data, client)

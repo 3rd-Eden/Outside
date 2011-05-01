@@ -69,7 +69,6 @@ text-shadow: 0px -1px 0px #4f8f34; color: #FFF;
 
 .box { min-width: 400px; position:relative }
 
-
 /**
  * Styling for the Authentication and login view
  *
@@ -222,8 +221,6 @@ aside.details { background: #fff; width:285px; min-width:285px; border-left:3px 
   .announced span.after { content: ''; position: absolute; border-style: solid; border-color: transparent; bottom: -10px; }
   .announced:after,
   .announced span.after { border-width: 0 0 10px 10px; border-left-color: #376e21; right: 0 }
-
-    
 
 /**
  * messages
