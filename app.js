@@ -67,7 +67,7 @@ io.on('connection', function( client ){
   client.details = {
     words: 0
   , lines: 0
-  , resync: 0
+  , shuffles: 0
   , session: new Date()
   };
   

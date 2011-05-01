@@ -1,24 +1,26 @@
-  <aside class="details">
-    <dl>
-      <dt class="nickname">Anonymous</dt>
-      <dd class="since">Chatting since <time>20:00 GTM</time></dd>
-      <dd class="gravatar"><img src="/i/anonymous.png" alt="Anonymous" /></dd>
-    </dl>
-    <ul class="status">
-      <li><strong>1.235</strong>lines</li>
-      <li><strong>8731</strong>words</li>
-      <li class="last"><strong>123</strong>laps</li>
-    </ul>
+<aside class="details hidden"></aside>
+<script type="text/template" id="details>
+  <dl>
+    <dt class="nickname">[%= attributes.nickname %]</dt>
+    <dd class="since">Chatting since <time datetime="[%= details.session %]">[%= details.session %]</time></dd>
+    <dd class="gravatar"><img src="[%= attributes.avatar %]" alt="[%= details.session %]" /></dd>
+  </dl>
+  <ul class="status">
+    <li><strong>[%= details.lines %]</strong>lines</li>
+    <li><strong>[%= details.words %]</strong>words</li>
+    <li class="last"><strong>[%= details.shuffels %]</strong>shuffles</li>
+  </ul>
 
-    <a class="btn pm">private message</a>
-    <a class="btn block">block user</a>
+  <a class="btn pm" href="#/message/[% attributes.slug %]">private message</a>
+  <a class="btn block" href="#/block/[% attributes.slug %]">block user</a>
 
-    <h4>Recent conversations <a href="#/details/nickname/realtime" class="realtime"></a></h4>
-    <hr />
-    <ol>
-      <li>Things you son of a bizzle. Curabitizzle crunk amizzle leo bizzle my shizz blandit dignissizzle. Crackalackin bling bling. Aenean get down get down. <time>10 minutes ago</time></li>
-      <li>Get down get down ipsum dolizzle sit amizzle, consectetuer adipiscing izzle. <time>10 minutes ago</time></li>
-      <li>Things you son of a bizzle. Curabitizzle crunk amizzle leo bizzle my shizz blandit dignissizzle. Crackalackin bling bling. Aenean get down get down. <time>10 minutes ago</time></li>
-      <li>Get down get down ipsum dolizzle sit amizzle, consectetuer adipiscing izzle. <time>10 minutes ago</time></li>
-    </ol>
-  </aside>
+  <h4>Recent conversations <a href="#/details/[% attributes.slug %]/realtime" class="realtime"></a></h4>
+  <hr />
+  <ol>
+    [% if(conversation.length){ %]
+      [% for(var i = 0, length = conversation.length; i < length; i++){ %]
+        <li>[% conversation[i].message %]<time datetime="[% conversation[i].time %]">[% conversation[i].time %]</time></li>
+      [% } %]
+    [% } %]
+  </ol>
+</script>
