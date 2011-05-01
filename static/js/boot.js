@@ -851,6 +851,13 @@
      */
     findPanel: function(id){ return $('section.box .view.' + id) },
     
+    /**
+     * Converts
+     *
+     * @param {String} date_str A ISO date string
+     * @returns {String} a pretty date
+     * @api public
+     */
     pretty: (function(){
       var time_formats = [
         [60, 'just now', 1] // 60
@@ -883,6 +890,7 @@
           token = 'from now';
           list_choice = 2;
         }
+        
         while (format = time_formats[i++]){
           if (seconds < format[0]) {
             if (typeof format[2] == 'string'){
