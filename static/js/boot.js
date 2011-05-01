@@ -423,8 +423,9 @@
      * @api public
      */
     announce: function(data){
-      // add a default title if none exists
+      // add a default data if none exists
       data.title = data.title || 'Announcement';
+      data.class = data.class || false;
       
       var announcement = $(render('announcement', data))
       .prependTo('div.boxed-btm form')
