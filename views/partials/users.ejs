@@ -5,11 +5,11 @@
  </div>
 </aside>
 <script type="text/template" id="user">
-<div class="user" id="user_[%= slug %]">
+<div class="user" id="[%= type == 'pm' ? type : 'user' %]_[%= slug %]">
   <a href="#/details/[%= slug %]">
     <img src="[%= avatar %]" alt="[%= nickname %]" />
   </a>
-  <a href="#/message/[%= slug %]" class="message">[%= nickname %]</a>
+  <a href="#/message/[%= slug %]" class="message" data-slug="[%= slug %]">[%= nickname %]</a>
   [% if(type == 'pm'){ %]
   <span>[%= unread %]</span>
   [% } %]

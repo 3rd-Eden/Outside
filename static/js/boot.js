@@ -222,17 +222,18 @@
      */
     proxy: {
       // validation and registration
-      'check:nickname':   'check:nickname',
-      'check:email':      'check:email',
-      'account:created':  'account:created',
+      'check:nickname':   'check:nickname'
+    , 'check:email':      'check:email'
+    , 'account:created':  'account:created'
       
       // messages
-      'comment':          'comment',
-      'announcement':     'announcement',
-      'user:join':        'user:join',
-      'user:depart':      'user:depart',
-      'user:roommates':   'user:roommates',
-      'heartbeat':        'heartbeat'
+    , 'comment':          'comment'
+    , 'announcement':     'announcement'
+    , 'private':          'private'
+    , 'user:join':        'user:join'
+    , 'user:depart':      'user:depart'
+    , 'user:roommates':   'user:roommates'
+    , 'heartbeat':        'heartbeat'
     },
     
     API: {
@@ -255,8 +256,12 @@
        *
        * @api public
        */
-      private: function(to, message){
-         EventedParser.io.send({type:'private', to: to, message: message.toString(), nickname: EventedParser.io.nickname});
+      private: function(slug, message){
+        var to = Outsiders.select(function(friend){ return friend.attributes.slug == slug })[0]
+          , request = {type:'private', to: to.attributes.nickname, message: message.toString(), nickname: this.nickname, time: new Date()};
+          
+        EventedParser.io.send(request);
+        EventedParser.trigger('private', request);
       },
       
       /**
@@ -267,7 +272,7 @@
        * @api public
        */
       blacklist: function(nickname){
-        EventedParser.io.send({type:'blacklist', blacklist:nickname.toString(), nickname: EventedParser.io.nickname});
+        EventedParser.io.send({type:'blacklist', blacklist:nickname.toString(), nickname: this.nickname});
       },
       
       /**
@@ -278,8 +283,6 @@
        * @api public
        */
       send: function(message){
-        // clean the message
-        
         var request = {type:'comment', message: message.toString(), nickname: this.nickname, rooms: this.rooms, time: new Date()};
         
         EventedParser.io.send(request);
@@ -641,7 +644,9 @@
       var self = this
         , me = self.me
         , account = me.account
-        , box = $('.box');
+        , box = $('.box')
+        , joined = $('aside.users .joined')
+        , pms = $('aside.users footer.pm')
       
       this.state = 'loggedin';
       this.view = 'chat';
@@ -653,8 +658,21 @@
         data.type = data.nickname === account.nickname ? 'me' : 'other';
         
         var slug = data.slug
-          , panel = self.findPanel(slug) || self.addPanel(slug);
+          , panel = self.findPanel(slug)
+          , from = Outsiders.get(data.from)
+          , pmbutton = pms.find('#pm_' + from.attributes.slug)
+          , unread;
         
+        // check if we need to add new PM indicator
+        if( !pmbutton.length ){
+        
+        } else {
+          unread = pmbutton.find('span');
+        }
+        
+        // make a panel for the messages if they don't exist yet and
+        // add the messgae
+        panel = panel.length ? panel : self.addPanel(slug);
         $(render('comment', data)).appendTo(panel);
       });
       
@@ -668,7 +686,8 @@
       EventedParser.on('announcement', function(data){
         // clear all current messages
         if (data.reset){
-          $('section.messages article').remove();
+          // make sure we only delete the chat history, not the private messages
+          $('section.messages div.chat article').remove();
           
           var me = Outsiders.me()
             , them = Outsiders.them();
@@ -696,11 +715,10 @@
         }
         
         // display the actual message from the server
-        if (data.message)
-          Status.announce(data);
-
+        if (data.message) Status.announce(data);
+        
       });
-            
+      
       /**
        * A new comment has been made by a user, we need to add it to the chat view
        * so it actually get's rendered propperly. 
@@ -756,19 +774,53 @@
       // prepare the application interface
       $('#masthead .salut a').html(account.nickname).attr('href', '#/details/' + account.nickname);
       
-      // attach the event listeners
+      /**
+       * Attach all event listeners for the chat view, we need to use `live` listener for all 
+       * the events. Because we are not reload the application for each view update. So to prevent
+       * flooding the browser with event listeners and complicating our application behavior we just
+       * do it the save way
+       */
+      
+      /**
+       * Attach a submit listener for the form. This allows us to send the mssages to the
+       * server.
+       *
+       * @todo work with different views, so we can also use this for PM messages
+       */
       box.find('form[name="chat"]').live("submit", function(e){
         e && e.preventDefault();
         
         var $self = $(this)
           , input = $self.find('input[name="message"]');
-          
-        EventedParser.API.send.call(account,input.val());
-          
+        
+        if (self.view === 'chat'){
+          EventedParser.API.send.call(account,input.val());
+        } else {
+          EventedParser.API.private.call(account,self.view, input.val());
+        }
         input.val(''); // clear the value
       });
       
-      // now that all UI changes are made, we can make the application visable, this way we don't
+      /**
+       * Attach a listener for the click events on the user buttons, so that we can start sending personal messages
+       */
+      joined.find('a.message').live("click", function(e){
+        e && e.preventDefault();
+        
+        var user = $(this)
+          , nickname = user.html()
+          , slug = user.attr('data-slug')
+          , me = Outsiders.me()
+          , panel = self.findPanel(slug);
+        
+        // @todo handle this better
+        if (me.attributes.slug == slug) return alert('Srsly?? You want to PM your self.. Odd ball');
+        
+        panel = panel.length ? panel : self.addPanel(slug);
+        self.view = slug;
+      });
+      
+      // Now that all UI changes are made, we can make the application visable, this way we don't
       // trigger unnessesary reflows + paint events in the browser.
       $('html').addClass('loggedin').find('.auth').hide().end().find('div.app').show();
       
@@ -797,7 +849,53 @@
      * @param {String} id The id of the panel
      * @api public
      */
-    findPanel: function(id){ return $('section.box .view.' + id) }
+    findPanel: function(id){ return $('section.box .view.' + id) },
+    
+    pretty: (function(){
+      var time_formats = [
+        [60, 'just now', 1] // 60
+      , [120, '1 minute ago', '1 minute from now'] // 60*2
+      , [3600, 'minutes', 60] // 60*60, 60
+      , [7200, '1 hour ago', '1 hour from now'] // 60*60*2
+      , [86400, 'hours', 3600] // 60*60*24, 60*60
+      , [172800, 'yesterday', 'tomorrow'] // 60*60*24*2
+      , [604800, 'days', 86400] // 60*60*24*7, 60*60*24
+      , [1209600, 'last week', 'next week'] // 60*60*24*7*4*2
+      , [2419200, 'weeks', 604800] // 60*60*24*7*4, 60*60*24*7
+      , [4838400, 'last month', 'next month'] // 60*60*24*7*4*2
+      , [29030400, 'months', 2419200] // 60*60*24*7*4*12, 60*60*24*7*4
+      , [58060800, 'last year', 'next year'] // 60*60*24*7*4*12*2
+      , [2903040000, 'years', 29030400] // 60*60*24*7*4*12*100, 60*60*24*7*4*12
+      , [5806080000, 'last century', 'next century'] // 60*60*24*7*4*12*100*2
+      , [58060800000, 'centuries', 2903040000] // 60*60*24*7*4*12*100*20, 60*60*24*7*4*12*100
+      ];
+      
+      return function(date_str){
+        var time = ('' + date_str).replace(/-/g,"/").replace(/[TZ]/g," ")
+        , seconds = (new Date - new Date(time)) / 1000
+        , token = 'ago'
+        , list_choice = 1
+        , i = 0
+        , format;
+        
+        if (seconds < 0) {
+          seconds = Math.abs(seconds);
+          token = 'from now';
+          list_choice = 2;
+        }
+        while (format = time_formats[i++]){
+          if (seconds < format[0]) {
+            if (typeof format[2] == 'string'){
+              return format[list_choice];
+            } else {
+              return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+            }
+          }
+        }
+        
+        return time;
+      }
+    }())
   });
   
   // reset hash state
