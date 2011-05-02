@@ -22,6 +22,7 @@ var Manager = require('./lib/manager')
  */
 require("./lib/io")(io);
 require("express-namespace");
+require("datejs");
 var app = module.exports = express.createServer();
 
 /**
@@ -118,7 +119,7 @@ io.on('connection', function( client ){
     if (field == 'nickname'){
       // clean up the value
       value = value.trim().toLowerCase();
-      if (value.length < 2 || value.length >= 24 )
+      if (value.length < 2 || value.length > 20 )
         return client.filter({type:"check:nickname", validates:false, message: value.length < 2 ? "Your nickname is to short" : "Your nickname is to long", field: field, value: value });
       
       temp = channel.users();
@@ -126,7 +127,6 @@ io.on('connection', function( client ){
       client.filter({ type: 'check:nickname', validates: validates, message: validates ? false : 'This nickname is already taken', field: field, value: data.value, nickname: value })
     } else if (field == 'email'){
       if (!/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a -z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(value) ){
-        //'// basic regexp test
         client.filter({ type: 'check:email', validates: false, message: 'Incorrect e-mail address', field: field, value: value });
       } else {
         client.filter({ type: 'check:email', validates: true, gravatar: gravatar.url(value, {s:48, r:'pg', d: '404'}), field: field, value: value });
@@ -158,7 +158,7 @@ io.on('connection', function( client ){
     client.nickname = data.nickname;
     client.slug = channel.slug(client.nickname);
     client.avatar = gravatar.url(data.email, {s:48, r:'pg', d: '404'});
-    client.details.connected = new Date();
+    client.details.connected = Date.today().toString('MMMM dS, yyyy');
     
     // subscribe to a channel and notify the user
     channel.subscribe(client);

@@ -966,7 +966,7 @@
     
     // dummy data, aka OMFG chain madness
     document.domain === "localhost" && $(document.body)
-      .find('input[name="nickname"]').val('example' +  Math.random()).end()
+      .find('input[name="nickname"]').val('example' +  Math.random().toFixed(4)).end()
       .find('input[name="email"]').val('info@3rd-Eden.com').end()
       .find('.auth form').trigger('submit').end()
   }
