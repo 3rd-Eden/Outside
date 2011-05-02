@@ -4,7 +4,7 @@
  */
 process.addListener( "uncaughtException", function captureException(err){
   console.log(err.stack.split("\n"));
-  console.dir(err );
+  console.dir(err);
 });
 
 /**
@@ -179,7 +179,14 @@ io.on('connection', function( client ){
     var target = channel.byNickname(data.nickname);
     
     if (!target) return client.filter({type: 'account:details', message: 'Couldn\'t find the user ' + data.nickname + '. You have just missed him!'});
-    return client.filter({type:'account:details', details: target.details, conversation: target.conversation});
+    
+    var attributes = {
+      nickname: target.nickname
+    , slug: channel.slug(target.nickname)
+    , avatar: target.avatar
+    , rooms: target.rooms
+    };
+    return client.filter({type:'account:details', details: target.details, conversation: target.conversation, attributes:attributes});
   });
   
   // handle messages from the clients

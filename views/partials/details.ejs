@@ -1,5 +1,5 @@
 <aside class="details hidden"></aside>
-<script type="text/template" id="details>
+<script type="text/template" id="details">
   <dl>
     <dt class="nickname">[%= attributes.nickname %]</dt>
     <dd class="since">Chatting since <time datetime="[%= details.session %]">[%= details.session %]</time></dd>
@@ -8,18 +8,18 @@
   <ul class="status">
     <li><strong>[%= details.lines %]</strong>lines</li>
     <li><strong>[%= details.words %]</strong>words</li>
-    <li class="last"><strong>[%= details.shuffels %]</strong>shuffles</li>
+    <li class="last"><strong>[%= details.shuffles %]</strong>shuffles</li>
   </ul>
 
-  <a class="btn pm" href="#/message/[% attributes.slug %]">private message</a>
-  <a class="btn block" href="#/block/[% attributes.slug %]">block user</a>
+  <a class="btn pm" href="#/message/[%= attributes.slug %]">private message</a>
+  <a class="btn block" href="#/block/[%= attributes.slug %]">block user</a>
 
-  <h4>Recent conversations <a href="#/details/[% attributes.slug %]/realtime" class="realtime"></a></h4>
+  <h4>Recent conversations <a href="#/details/[%= attributes.slug %]/realtime" class="realtime"></a></h4>
   <hr />
   <ol>
-    [% if(conversation.length){ %]
-      [% for(var i = 0, length = conversation.length; i < length; i++){ %]
-        <li>[% conversation[i].message %]<time datetime="[% conversation[i].time %]">[% conversation[i].time %]</time></li>
+    [% if (conversations.length){ %]
+      [% for(var i = 0, length = conversations.length; i < length; i++){ %]
+        <li>[%= conversations[i].message %]<time datetime="[%= conversations[i].time %]">[%= conversations[i].time %]</time></li>
       [% } %]
     [% } %]
   </ol>

@@ -854,7 +854,8 @@
         EventedParser.once("account:details", function(data){
           if (data.message) return Status.announce({message:data.message, title: 'Oh dear'});
           
-          console.log("has details :D");
+          data.conversations = data.conversations || [];
+          $('aside.details').html(render('details', data)).removeClass('hidden')
         });
         
         EventedParser.API.details(slug);

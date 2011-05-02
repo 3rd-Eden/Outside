@@ -19,5 +19,6 @@
   , "socket.io": "0.6.16"
   , "cluster": "0.5.5"
   , "validator": "0.1.9"
+  , "datejs": ""
   }
 }
