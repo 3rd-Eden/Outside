@@ -10,15 +10,15 @@
     "node": ">= 0.4.3"
   }
 , "dependencies": {
-    "connect-auth": "0.2.2"
-  , "ejs": "0.3.1"
+    "connect-auth": "0.6.1"
+  , "ejs": "2.5.2"
   , "express": "2.0.0rc"
-  , "express-namespace": "0.0.3"
-  , "gravatar": "1.0.2"
-  , "oauth": "0.9.0"
-  , "socket.io": "0.6.16"
-  , "cluster": "0.5.5"
-  , "validator": "0.1.9"
+  , "express-namespace": "0.1.1"
+  , "gravatar": "1.6.0"
+  , "oauth": "0.9.14"
+  , "socket.io": "1.5.1"
+  , "cluster": "0.7.7"
+  , "validator": "6.1.0"
   , "datejs": ""
   }
 }
